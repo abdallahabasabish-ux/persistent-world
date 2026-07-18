@@ -3,1267 +3,573 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Elysium: Persistent World - واجهة اللعبة الرئيسية" />
-    <title>Elysium · لوحة التحكم</title>
-
+    <title>Elysium · مرحباً بك</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <!-- Font Awesome 6 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6 (مكتبة الأيقونات) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
-    </script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
-
-    <!-- ============================================================
-    الأنماط العامة (مشتركة مع باقي الصفحات)
-    ============================================================ -->
-    <link rel="stylesheet" href="../css/styles.css" />
+    <!-- Firebase SDKs (v9 compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
+    </script>
 
     <style>
         /* ============================================================
-           أنماط خاصة بواجهة اللعبة
+           أنماط خاصة بـ welcome مع Firebase
            ============================================================ */
-        :root {
-            --sidebar-width: 260px;
-            --header-height: 64px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Cairo', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            overflow: hidden;
-            height: 100vh;
+            background: #06060b;
             display: flex;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ============================================================
-           الشريط الجانبي (Sidebar)
-           ============================================================ */
-        .sidebar {
-            width: var(--sidebar-width);
+            align-items: center;
+            justify-content: center;
             min-height: 100vh;
-            background: rgba(10, 10, 24, 0.95);
-            backdrop-filter: blur(20px);
-            border-left: 1px solid rgba(255, 255, 255, 0.03);
-            display: flex;
-            flex-direction: column;
-            padding: 20px 16px;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-            z-index: 100;
-            overflow-y: auto;
+            font-family: 'Cairo', sans-serif;
+            padding: 20px;
         }
 
-        .sidebar .logo {
-            font-size: 1.4rem;
+        .welcome-card {
+            background: rgba(18, 18, 42, 0.75);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 24px;
+            padding: 40px 36px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .id-card-full {
+            background: rgba(6, 6, 11, 0.8);
+            border: 1px solid rgba(240, 179, 0, 0.06);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 14px;
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            transition: 0.3s;
+        }
+
+        .stat-item:hover {
+            border-color: rgba(240, 179, 0, 0.05);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .stat-item .num {
+            font-size: 1.6rem;
             font-weight: 900;
-            color: #fff;
-            text-decoration: none;
-            display: flex;
+            color: #ffd866;
+            transition: 0.3s;
+        }
+
+        .stat-item .label-icon {
+            font-size: 1rem;
+            margin-left: 4px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #f0b300, #b8860b);
+            color: #0a0a0f;
+            font-weight: 800;
+            padding: 16px 48px;
+            border-radius: 60px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1.1rem;
+            display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            margin-bottom: 20px;
-        }
-
-        .sidebar .logo i,
-        .sidebar .logo span {
-            background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .sidebar .nav-section {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .sidebar .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            border-radius: 12px;
-            color: var(--text-muted);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: var(--transition);
-            cursor: pointer;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: right;
-            font-family: 'Cairo', sans-serif;
         }
 
-        .sidebar .nav-item i {
-            width: 20px;
-            font-size: 1.1rem;
-            text-align: center;
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(240, 179, 0, 0.2);
         }
 
-        .sidebar .nav-item:hover {
+        .btn-start:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Skeleton loading */
+        .skeleton {
             background: rgba(255, 255, 255, 0.04);
-            color: var(--text-primary);
-        }
-
-        .sidebar .nav-item.active {
-            background: rgba(240, 179, 0, 0.06);
-            color: var(--gold-light);
-            border: 1px solid rgba(240, 179, 0, 0.04);
-        }
-
-        .sidebar .nav-item .badge {
-            margin-right: auto;
-            background: rgba(240, 179, 0, 0.1);
-            color: var(--gold-light);
-            font-size: 0.6rem;
-            padding: 2px 10px;
-            border-radius: 100px;
-            font-weight: 700;
-        }
-
-        .sidebar .user-profile {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .sidebar .user-profile .avatar-sm {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(240, 179, 0, 0.08);
-            border: 1px solid rgba(240, 179, 0, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: var(--gold-light);
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .sidebar .user-profile .avatar-sm img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .sidebar .user-profile .user-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .sidebar .user-profile .user-info .name {
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        .sidebar .user-profile .user-info .role {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-        }
-
-        /* ============================================================
-           المحتوى الرئيسي
-           ============================================================ */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-
-        /* ============================================================
-           الشريط العلوي (Top Bar)
-           ============================================================ */
-        .topbar {
-            height: var(--header-height);
-            background: rgba(10, 10, 24, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            flex-shrink: 0;
-            gap: 16px;
-        }
-
-        .topbar .breadcrumb {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .topbar .breadcrumb span {
-            color: var(--text-primary);
-        }
-
-        .topbar .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .topbar .topbar-stats {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 0.8rem;
-        }
-
-        .topbar .topbar-stats .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-secondary);
-        }
-
-        .topbar .topbar-stats .stat-item i {
-            color: var(--gold);
-            font-size: 0.9rem;
-        }
-
-        .topbar .topbar-stats .stat-item .value {
-            color: var(--text-primary);
-            font-weight: 700;
-        }
-
-        .topbar .notification-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .topbar .notification-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .topbar .notification-btn .dot {
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            width: 8px;
-            height: 8px;
-            background: #ef4444;
-            border-radius: 50%;
-            border: 2px solid rgba(10, 10, 24, 0.8);
-        }
-
-        .topbar .logout-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 6px 12px;
             border-radius: 8px;
-            display: flex;
+            animation: pulse 1.5s ease-in-out infinite;
+            height: 24px;
+            width: 80%;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .skeleton-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* تحسين العرض في الجوال */
+        @media (max-width: 640px) {
+            .welcome-card {
+                padding: 24px 16px;
+            }
+            .stat-item .num {
+                font-size: 1.2rem;
+            }
+            .btn-start {
+                padding: 14px 28px;
+                font-size: 1rem;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* أيقونات الحالة */
+        .status-badge {
+            display: inline-flex;
             align-items: center;
             gap: 6px;
-        }
-
-        .topbar .logout-btn:hover {
-            color: #ef4444;
-            background: rgba(239, 68, 68, 0.04);
-        }
-
-        /* ============================================================
-           منطقة المحتوى (Content Area)
-           ============================================================ */
-        .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px;
-            background: radial-gradient(ellipse at 70% 20%, rgba(240, 179, 0, 0.02), transparent 50%),
-                radial-gradient(ellipse at 30% 80%, rgba(120, 80, 200, 0.01), transparent 50%),
-                var(--bg-primary);
-        }
-
-        .content-area::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .content-area::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .content-area::-webkit-scrollbar-thumb {
-            background: rgba(240, 179, 0, 0.2);
-            border-radius: 10px;
-        }
-
-        /* ============================================================
-           البطاقات (Cards)
-           ============================================================ */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card-dash {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: var(--radius);
-            padding: 20px 18px;
-            transition: var(--transition);
-        }
-
-        .stat-card-dash:hover {
-            border-color: rgba(240, 179, 0, 0.06);
-            transform: translateY(-2px);
-        }
-
-        .stat-card-dash .stat-icon {
-            font-size: 1.4rem;
-            color: var(--gold-light);
-            opacity: 0.7;
-            margin-bottom: 8px;
-        }
-
-        .stat-card-dash .stat-number {
-            font-size: 2rem;
-            font-weight: 900;
-            color: var(--text-primary);
-        }
-
-        .stat-card-dash .stat-label {
+            padding: 4px 14px;
+            border-radius: 100px;
             font-size: 0.7rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        /* ============================================================
-           علامات التبويب (Tabs)
-           ============================================================ */
-        .tabs-container {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: var(--radius);
-            overflow: hidden;
-            margin-bottom: 24px;
-        }
-
-        .tabs-header {
-            display: flex;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            padding: 0 16px;
-            overflow-x: auto;
-            gap: 4px;
-        }
-
-        .tab-btn {
-            padding: 14px 20px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: 'Cairo', sans-serif;
-            border-bottom: 2px solid transparent;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tab-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .tab-btn.active {
-            color: var(--gold-light);
-            border-bottom-color: var(--gold);
-        }
-
-        .tab-content {
-            padding: 24px;
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeUp 0.3s ease;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ============================================================
-           الرسوم البيانية
-           ============================================================ */
-        .chart-wrapper {
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 16px;
-            padding: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.02);
-            height: 220px;
-            position: relative;
-        }
-
-        .chart-wrapper canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        /* ============================================================
-           بطاقة الشخصية السريعة (في التبويب)
-           ============================================================ */
-        .quick-profile {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 16px;
-            padding: 16px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.02);
-            flex-wrap: wrap;
-        }
-
-        .quick-profile .avatar-lg {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: rgba(240, 179, 0, 0.06);
-            border: 1px solid rgba(240, 179, 0, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.2rem;
-            color: var(--gold-light);
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .quick-profile .avatar-lg img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .quick-profile .info h4 {
-            font-weight: 800;
-            font-size: 1.1rem;
-            margin: 0;
-        }
-
-        .quick-profile .info .sub {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .quick-profile .profile-stats {
-            display: flex;
-            gap: 24px;
-            margin-right: auto;
-            flex-wrap: wrap;
-        }
-
-        .quick-profile .profile-stats .pstat {
-            text-align: center;
-        }
-
-        .quick-profile .profile-stats .pstat .num {
-            font-weight: 900;
-            font-size: 1.2rem;
-            color: var(--gold-light);
-        }
-
-        .quick-profile .profile-stats .pstat .lbl {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        /* ============================================================
-           لوحة الإعلام (News Feed)
-           ============================================================ */
-        .news-item {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-        }
-
-        .news-item:last-child {
-            border-bottom: none;
-        }
-
-        .news-item .icon {
-            color: var(--gold-light);
-            opacity: 0.6;
-            font-size: 1rem;
-            margin-top: 2px;
-        }
-
-        .news-item .content {
-            flex: 1;
-        }
-
-        .news-item .content .title {
             font-weight: 700;
-            font-size: 0.9rem;
         }
 
-        .news-item .content .desc {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+        .status-badge.online {
+            background: rgba(34, 197, 94, 0.08);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.05);
         }
 
-        .news-item .time {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            white-space: nowrap;
-        }
-
-        /* ============================================================
-           توافق الجوال
-           ============================================================ */
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                transform: translateX(100%);
-                width: 280px;
-                box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
-                border-left: none;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 99;
-            }
-
-            .sidebar-overlay.open {
-                display: block;
-            }
-
-            .topbar .topbar-stats {
-                display: none;
-            }
-
-            .dashboard-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .quick-profile {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .quick-profile .profile-stats {
-                margin-right: 0;
-                width: 100%;
-                justify-content: space-around;
-            }
-
-            .tabs-header {
-                padding: 0 8px;
-            }
-
-            .tab-btn {
-                padding: 10px 12px;
-                font-size: 0.75rem;
-            }
-
-            .tab-btn span {
-                display: none;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-
-            .stat-card-dash .stat-number {
-                font-size: 1.4rem;
-            }
-
-            .topbar {
-                padding: 0 12px;
-            }
-
-            .content-area {
-                padding: 16px;
-            }
-
-            .tab-content {
-                padding: 16px;
-            }
-        }
-
-        /* زر تبديل القائمة الجانبية */
-        .sidebar-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.4rem;
-            cursor: pointer;
-            padding: 4px 8px;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar-toggle {
-                display: block;
-            }
+        .status-badge.offline {
+            background: rgba(239, 68, 68, 0.08);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.05);
         }
     </style>
 </head>
 <body>
 
-    <!-- ============================================================
-    طبقة الإخفاء (للجوال)
-    ============================================================ -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- ============================================================
-    الشريط الجانبي
-    ============================================================ -->
-    <aside class="sidebar" id="sidebar" role="navigation" aria-label="القائمة الرئيسية">
-        <a href="../index.html" class="logo">
-            <i class="fas fa-crown"></i>
-            <span>Elysium</span>
+    <div class="welcome-card" id="app">
+        <!-- Logo -->
+        <a href="../index.html" class="flex items-center justify-center gap-2 text-2xl font-black text-white no-underline mb-1">
+            <i class="fas fa-crown text-amber-400"></i>
+            <span class="bg-gradient-to-l from-amber-200 to-amber-600 bg-clip-text text-transparent">Elysium</span>
         </a>
+        <p class="text-center text-gray-400 text-sm mb-6" id="welcomeSubtitle">
+            <i class="fas fa-spinner fa-spin ml-1"></i> جاري تحميل بياناتك...
+        </p>
 
-        <nav class="nav-section">
-            <button class="nav-item active" data-tab="overview">
-                <i class="fas fa-gauge-high"></i> الرئيسية
-            </button>
-            <button class="nav-item" data-tab="map">
-                <i class="fas fa-map"></i> الخريطة
-                <span class="badge">جديد</span>
-            </button>
-            <button class="nav-item" data-tab="economy">
-                <i class="fas fa-chart-line"></i> الاقتصاد
-            </button>
-            <button class="nav-item" data-tab="politics">
-                <i class="fas fa-landmark"></i> السياسة
-            </button>
-            <button class="nav-item" data-tab="military">
-                <i class="fas fa-shield-halved"></i> الجيش
-            </button>
-            <button class="nav-item" data-tab="media">
-                <i class="fas fa-newspaper"></i> الإعلام
-            </button>
-            <button class="nav-item" data-tab="profile">
-                <i class="fas fa-user"></i> شخصيتي
-            </button>
-        </nav>
-
-        <div class="user-profile">
-            <div class="avatar-sm" id="sidebarAvatar">
-                <i class="fas fa-crown"></i>
+        <!-- ============================================================
+        بطاقة الهوية (سيتم تعبئتها بواسطة JavaScript)
+        ============================================================ -->
+        <div class="id-card-full" id="idCard">
+            <!-- الرأس: الصورة + الاسم + رقم الهوية -->
+            <div class="flex items-center gap-4 border-b border-white/5 pb-4" id="headerSection">
+                <div class="w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-4xl text-amber-400 overflow-hidden flex-shrink-0" id="avatarContainer">
+                    <i class="fas fa-crown" id="avatarIcon"></i>
+                    <img id="avatarImage" style="display:none; width:100%; height:100%; object-fit:cover;" />
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h2 class="font-black text-2xl truncate" id="displayName">...</h2>
+                    <div class="flex flex-wrap items-center gap-2 mt-1">
+                        <span class="text-gray-500 text-sm" id="displayId">#ELY-2026-XXXX</span>
+                        <span class="status-badge online" id="statusBadge"><i class="fas fa-circle text-[8px]"></i> نشط</span>
+                    </div>
+                    <div class="bg-amber-500/10 text-amber-400 text-xs px-3 py-0.5 rounded-full inline-block mt-1" id="scenarioBadge">...</div>
+                </div>
             </div>
-            <div class="user-info">
-                <div class="name" id="sidebarName">أحمد الملك</div>
-                <div class="role" id="sidebarRole">مواطن · فقير</div>
+
+            <!-- البيانات الأساسية -->
+            <div class="grid grid-cols-3 gap-2 mt-4 text-sm" id="basicInfo">
+                <div><span class="text-gray-500 text-xs"><i class="fas fa-venus-mars ml-1"></i>الجنس</span><div id="infoGender">...</div></div>
+                <div><span class="text-gray-500 text-xs"><i class="fas fa-calendar-day ml-1"></i>العمر</span><div id="infoAge">...</div></div>
+                <div><span class="text-gray-500 text-xs"><i class="fas fa-flag ml-1"></i>الدولة</span><div id="infoCountry">...</div></div>
+            </div>
+
+            <!-- إحصائيات البداية -->
+            <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mt-6" id="statsGrid">
+                <!-- سيتم تعبئتها بواسطة JS -->
+            </div>
+
+            <!-- رسالة خطأ إن وجدت -->
+            <div id="errorMessage" class="hidden mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-2">
+                <i class="fas fa-circle-exclamation"></i>
+                <span id="errorText"></span>
             </div>
         </div>
-    </aside>
+
+        <!-- أزرار الإجراءات -->
+        <div class="flex flex-col md:flex-row gap-4 justify-center mt-8">
+            <a href="game.html" class="btn-start" id="startBtn">
+                <i class="fas fa-play"></i> ابدأ حياتك
+            </a>
+            <a href="choose-scenario.html" class="text-gray-400 hover:text-white text-sm flex items-center justify-center">
+                <i class="fas fa-arrow-right ml-1"></i> عد للسيناريو
+            </a>
+            <button id="logoutBtn" class="text-gray-500 hover:text-red-400 text-sm flex items-center justify-center bg-transparent border-none cursor-pointer">
+                <i class="fas fa-right-from-bracket ml-1"></i> خروج
+            </button>
+        </div>
+    </div>
 
     <!-- ============================================================
-    المحتوى الرئيسي
-    ============================================================ -->
-    <div class="main-content">
-
-        <!-- الشريط العلوي -->
-        <header class="topbar">
-            <div style="display:flex;align-items:center;gap:12px;">
-                <button class="sidebar-toggle" id="sidebarToggle" aria-label="فتح القائمة">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="breadcrumb">
-                    <i class="fas fa-crown" style="color:var(--gold-light);font-size:0.7rem;"></i>
-                    <span>لوحة التحكم</span>
-                </div>
-            </div>
-
-            <div class="topbar-actions">
-                <div class="topbar-stats">
-                    <div class="stat-item">
-                        <i class="fas fa-coins"></i>
-                        <span class="value" id="topbarMoney">١٠٠٠</span>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-star"></i>
-                        <span class="value" id="topbarPopularity">٣٠</span>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-shield"></i>
-                        <span class="value" id="topbarReputation">٥٠</span>
-                    </div>
-                </div>
-                <button class="notification-btn" id="notifBtn" aria-label="الإشعارات">
-                    <i class="fas fa-bell"></i>
-                    <span class="dot"></span>
-                </button>
-                <button class="logout-btn" id="logoutBtn">
-                    <i class="fas fa-right-from-bracket"></i>
-                    <span>خروج</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- منطقة المحتوى -->
-        <div class="content-area" id="contentArea">
-
-            <!-- ============================================================
-            علامات التبويب (Tabs)
-            ============================================================ -->
-            <div class="tabs-container">
-                <div class="tabs-header" id="tabsHeader">
-                    <button class="tab-btn active" data-tab="overview"><i class="fas fa-gauge-high"></i> <span>نظرة عامة</span></button>
-                    <button class="tab-btn" data-tab="economy"><i class="fas fa-chart-line"></i> <span>الاقتصاد</span></button>
-                    <button class="tab-btn" data-tab="politics"><i class="fas fa-landmark"></i> <span>السياسة</span></button>
-                    <button class="tab-btn" data-tab="military"><i class="fas fa-shield-halved"></i> <span>الجيش</span></button>
-                    <button class="tab-btn" data-tab="media"><i class="fas fa-newspaper"></i> <span>الإعلام</span></button>
-                </div>
-
-                <!-- ============================================================
-                تبويب: نظرة عامة
-                ============================================================ -->
-                <div class="tab-content active" id="tab-overview">
-                    <!-- بطاقات إحصائيات سريعة -->
-                    <div class="dashboard-grid" id="statsGrid">
-                        <!-- سيتم تعبئتها بواسطة JavaScript -->
-                    </div>
-
-                    <!-- شخصية سريعة -->
-                    <div class="quick-profile" id="quickProfile">
-                        <div class="avatar-lg" id="profileAvatar"><i class="fas fa-crown"></i></div>
-                        <div class="info">
-                            <h4 id="profileName">أحمد الملك</h4>
-                            <div class="sub" id="profileSub">مواطن · فقير · النقابة: الدولة</div>
-                        </div>
-                        <div class="profile-stats">
-                            <div class="pstat"><div class="num" id="pMoney">١٠٠٠</div><div class="lbl">💰 أموال</div></div>
-                            <div class="pstat"><div class="num" id="pHealth">٨٠</div><div class="lbl">❤️ صحة</div></div>
-                            <div class="pstat"><div class="num" id="pEdu">٤٠</div><div class="lbl">📚 تعليم</div></div>
-                        </div>
-                    </div>
-
-                    <!-- الرسوم البيانية (خط ودائري) -->
-                    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:24px;">
-                        <div class="chart-wrapper">
-                            <canvas id="lineChart"></canvas>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="doughnutChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- آخر الأخبار -->
-                    <div style="margin-top:24px;background:var(--bg-card);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,0.02);">
-                        <h4 style="font-weight:700;margin-bottom:12px;"><i class="fas fa-newspaper" style="color:var(--gold-light);"></i> آخر المستجدات</h4>
-                        <div id="newsFeed"></div>
-                    </div>
-                </div>
-
-                <!-- ============================================================
-                تبويب: الاقتصاد (مثال)
-                ============================================================ -->
-                <div class="tab-content" id="tab-economy">
-                    <h3 class="text-lg font-bold mb-4">📍 الأسواق المالية</h3>
-                    <p class="text-secondary">هنا سيتم عرض البورصة، أسعار العملات، التضخم، والضرائب. (قيد التطوير)</p>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
-                        <div class="stat-card-dash"><div class="stat-label">سعر الذهب</div><div class="stat-number">١٨٩٠</div></div>
-                        <div class="stat-card-dash"><div class="stat-label">معدل التضخم</div><div class="stat-number">٣.٢٪</div></div>
-                    </div>
-                </div>
-
-                <!-- ============================================================
-                تبويب: السياسة
-                ============================================================ -->
-                <div class="tab-content" id="tab-politics">
-                    <h3 class="text-lg font-bold mb-4">🏛️ المشهد السياسي</h3>
-                    <p class="text-secondary">الحكومة الحالية، الأحزاب، الانتخابات القادمة.</p>
-                    <div style="margin-top:16px;background:rgba(255,255,255,0.01);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);">
-                        <div><span class="font-bold">الرئيس الحالي:</span> محمد العتيبي</div>
-                        <div><span class="font-bold">الحزب الحاكم:</span> حزب النهضة</div>
-                        <div><span class="font-bold">الانتخابات القادمة:</span> بعد ٨٤ يوم</div>
-                    </div>
-                </div>
-
-                <!-- ============================================================
-                تبويب: الجيش
-                ============================================================ -->
-                <div class="tab-content" id="tab-military">
-                    <h3 class="text-lg font-bold mb-4">⚔️ القوات المسلحة</h3>
-                    <p class="text-secondary">القوات البرية، البحرية، الجوية، والدفاع الجوي.</p>
-                    <div class="grid grid-cols-2 gap-4 mt-4">
-                        <div class="stat-card-dash"><div class="stat-label">جنود</div><div class="stat-number">١٢٤٨</div></div>
-                        <div class="stat-card-dash"><div class="stat-label">دبابات</div><div class="stat-number">٦٢</div></div>
-                    </div>
-                </div>
-
-                <!-- ============================================================
-                تبويب: الإعلام
-                ============================================================ -->
-                <div class="tab-content" id="tab-media">
-                    <h3 class="text-lg font-bold mb-4">📰 الإعلام والتأثير</h3>
-                    <p class="text-secondary">القنوات الإخبارية، الصحف، ومدى تأثيرها على الرأي العام.</p>
-                    <div class="grid grid-cols-1 gap-3 mt-4">
-                        <div class="news-item"><div class="icon"><i class="fas fa-tv"></i></div><div class="content"><div class="title">قناة Elysium نيوز</div><div class="desc">تغطية حية للجلسة البرلمانية</div></div><div class="time">منذ ١٠ د</div></div>
-                        <div class="news-item"><div class="icon"><i class="fas fa-newspaper"></i></div><div class="content"><div class="title">جريدة الصباح</div><div class="desc">تحقيق حول الفساد الإداري</div></div><div class="time">منذ ساعة</div></div>
-                    </div>
-                </div>
-
-            </div><!-- نهاية tabs-container -->
-
-        </div><!-- نهاية content-area -->
-    </div><!-- نهاية main-content -->
-
-    <!-- ============================================================
-    JAVASCRIPT
+    JAVASCRIPT — Firebase Integration
     ============================================================ -->
     <script>
-        (function gameModule() {
+        (function welcomeFirebase() {
             'use strict';
 
             // ============================================================
-            // بيانات وهمية (Mock Data) — تحاكي عالم اللعبة
+            // 1. تهيئة Firebase (من الإعدادات المقدمة)
             // ============================================================
-            const gameData = {
-                player: {
-                    name: 'أحمد الملك',
-                    avatar: null, // null أو base64
-                    icon: 'fa-crown',
-                    scenario: 'فقير',
-                    guild: 'الدولة / الحكم',
-                    money: 1000,
-                    health: 80,
-                    education: 40,
-                    reputation: 50,
-                    popularity: 30,
-                    properties: 0,
-                },
-                world: {
-                    countries: 124,
-                    players: 8472,
-                    npcs: 14.6, // مليون
-                    presidents: 23,
-                    wars: 89,
-                    gdp: 1.2, // تريليون
-                    inflation: 3.2,
-                },
-                news: [
-                    { icon: 'fa-crown', title: 'الرئيس يعلن عن حزمة تحفيز اقتصادي', desc: 'سيتم ضخ ٢٠٠ مليون في المشاريع الصغرى',
-                        time: 'منذ ١٠ د' },
-                    { icon: 'fa-landmark', title: 'البرلمان يوافق على قانون الضرائب الجديد', desc: 'نسبة الضريبة ترتفع إلى ١٨٪',
-                        time: 'منذ ٣ س' },
-                    { icon: 'fa-shield-halved', title: 'مناورات عسكرية على الحدود الشرقية', desc: 'مشاركة ١٢٠٠ جندي و ٤٠ دبابة',
-                        time: 'منذ ٥ س' },
-                    { icon: 'fa-chart-line', title: 'البورصة تغلق على ارتفاع ٢.٤٪', desc: 'قطاع التكنولوجيا يقود المكاسب',
-                        time: 'منذ ٨ س' },
-                    { icon: 'fa-seedling', title: 'موسم الحصاد يبدأ في المناطق الجنوبية', desc: 'توقعات بمحصول قياسي هذا العام',
-                        time: 'منذ يوم' },
-                ],
-                // بيانات الرسم البياني الخطي (التضخم خلال ٦ أشهر)
-                inflationData: [2.8, 3.1, 3.5, 3.2, 3.8, 3.2],
-                // بيانات الرسم البياني الدائري (توزيع الناتج المحلي)
-                gdpSectors: {
-                    'الزراعة': 18,
-                    'الصناعة': 32,
-                    'الخدمات': 50,
-                },
+            const firebaseConfig = {
+                apiKey: "AIzaSyASbbpibXQb4S-C6os1CkSmWYlvhtx6KMQ",
+                authDomain: "persistent-world.firebaseapp.com",
+                projectId: "persistent-world",
+                storageBucket: "persistent-world.firebasestorage.app",
+                messagingSenderId: "933145890555",
+                appId: "1:933145890555:web:598d13ef91464bb2416a5e",
+                measurementId: "G-C226NX5E2T"
             };
 
+            // التحقق من تحميل Firebase
+            if (typeof firebase === 'undefined') {
+                console.error('❌ Firebase SDK لم يتم تحميله.');
+                document.getElementById('welcomeSubtitle').textContent = '⚠️ خطأ في تحميل Firebase';
+                return;
+            }
+
+            const app = firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
             // ============================================================
-            // جلب البيانات المخزنة من sessionStorage (إن وجدت)
+            // 2. دوال مساعدة للعرض
             // ============================================================
-            function loadPlayerData() {
+            const elements = {
+                subtitle: document.getElementById('welcomeSubtitle'),
+                avatarContainer: document.getElementById('avatarContainer'),
+                avatarIcon: document.getElementById('avatarIcon'),
+                avatarImage: document.getElementById('avatarImage'),
+                displayName: document.getElementById('displayName'),
+                displayId: document.getElementById('displayId'),
+                statusBadge: document.getElementById('statusBadge'),
+                scenarioBadge: document.getElementById('scenarioBadge'),
+                infoGender: document.getElementById('infoGender'),
+                infoAge: document.getElementById('infoAge'),
+                infoCountry: document.getElementById('infoCountry'),
+                statsGrid: document.getElementById('statsGrid'),
+                errorMessage: document.getElementById('errorMessage'),
+                errorText: document.getElementById('errorText'),
+                startBtn: document.getElementById('startBtn'),
+                logoutBtn: document.getElementById('logoutBtn'),
+            };
+
+            // تعريف أيقونات الإحصائيات
+            const statIcons = {
+                money: 'fa-coins',
+                health: 'fa-heart',
+                education: 'fa-graduation-cap',
+                reputation: 'fa-star',
+                popularity: 'fa-user-group',
+                properties: 'fa-building'
+            };
+
+            const statLabels = {
+                money: 'أموال',
+                health: 'صحة',
+                education: 'تعليم',
+                reputation: 'سمعة',
+                popularity: 'شعبية',
+                properties: 'ممتلكات'
+            };
+
+            function renderStats(stats) {
+                if (!stats) stats = {};
+                const defaultStats = { money: 0, health: 0, education: 0, reputation: 0, popularity: 0, properties: 0 };
+                const s = { ...defaultStats, ...stats };
+
+                elements.statsGrid.innerHTML = Object.keys(statIcons).map(key => `
+                    <div class="stat-item">
+                        <div class="num">${s[key]?.toLocaleString?.() || s[key] || '٠'}</div>
+                        <div class="text-gray-500 text-xs">
+                            <i class="fas ${statIcons[key]} label-icon"></i>
+                            ${statLabels[key]}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function showError(msg) {
+                elements.errorMessage.classList.remove('hidden');
+                elements.errorText.textContent = msg;
+            }
+
+            function hideError() {
+                elements.errorMessage.classList.add('hidden');
+            }
+
+            function setLoading(state) {
+                if (state) {
+                    elements.subtitle.innerHTML = '<i class="fas fa-spinner fa-spin ml-1"></i> جاري تحميل بياناتك...';
+                    elements.startBtn.disabled = true;
+                } else {
+                    elements.subtitle.textContent = 'مرحباً بك في عالمك الجديد';
+                    elements.startBtn.disabled = false;
+                }
+            }
+
+            // ============================================================
+            // 3. عرض البيانات (من Firebase أو sessionStorage)
+            // ============================================================
+            function displayCharacterData(data) {
+                if (!data) {
+                    showError('لا توجد بيانات شخصية. يرجى إنشاء شخصية أولاً.');
+                    setLoading(false);
+                    return;
+                }
+
+                hideError();
+
+                // الصورة الرمزية
+                if (data.avatarImage) {
+                    elements.avatarIcon.style.display = 'none';
+                    elements.avatarImage.style.display = 'block';
+                    elements.avatarImage.src = data.avatarImage;
+                } else {
+                    elements.avatarIcon.style.display = 'block';
+                    elements.avatarImage.style.display = 'none';
+                    elements.avatarIcon.className = `fas ${data.icon || 'fa-crown'}`;
+                }
+
+                // الاسم ورقم الهوية
+                elements.displayName.textContent = data.fullName || 'مواطن';
+                elements.displayId.textContent = data.idNumber || '#ELY-2026-XXXX';
+
+                // حالة الاتصال (نشط دائماً)
+                elements.statusBadge.innerHTML = '<i class="fas fa-circle text-[8px]"></i> نشط';
+                elements.statusBadge.className = 'status-badge online';
+
+                // السيناريو
+                elements.scenarioBadge.textContent = data.scenario || 'غير محدد';
+
+                // البيانات الأساسية
+                elements.infoGender.textContent = data.gender || 'غير محدد';
+                elements.infoAge.textContent = data.age ? `${data.age} سنة` : 'غير محدد';
+                elements.infoCountry.textContent = data.country || 'غير محدد';
+
+                // الإحصائيات
+                const stats = data.stats || {};
+                renderStats(stats);
+
+                // حفظ البيانات في sessionStorage للاستخدام في الصفحات التالية
+                sessionStorage.setItem('elysium_character', JSON.stringify(data));
+
+                setLoading(false);
+            }
+
+            // ============================================================
+            // 4. جلب البيانات من Firestore
+            // ============================================================
+            async function fetchUserData(uid) {
+                try {
+                    const docRef = db.collection('users').doc(uid);
+                    const doc = await docRef.get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        // تحويل البيانات إلى الصيغة المطلوبة
+                        const charData = {
+                            fullName: data.displayName || data.fullName || 'مواطن',
+                            avatarImage: data.photoURL || data.avatarImage || null,
+                            icon: data.icon || 'fa-crown',
+                            idNumber: data.idNumber || '#ELY-2026-' + Math.random().toString(36).substring(2, 6)
+                                .toUpperCase(),
+                            gender: data.gender || 'غير محدد',
+                            age: data.age || 25,
+                            country: data.country || 'غير محدد',
+                            city: data.city || 'غير محدد',
+                            scenario: data.scenario || 'متوسط',
+                            guild: data.guild || 'عام',
+                            stats: data.stats || {
+                                money: 1000,
+                                health: 80,
+                                education: 40,
+                                reputation: 50,
+                                popularity: 30,
+                                properties: 0
+                            }
+                        };
+                        return charData;
+                    } else {
+                        console.warn('⚠️ لا توجد وثيقة للمستخدم في Firestore، استخدام sessionStorage.');
+                        return null;
+                    }
+                } catch (error) {
+                    console.warn('⚠️ خطأ في قراءة Firestore:', error);
+                    return null;
+                }
+            }
+
+            // ============================================================
+            // 5. الوظيفة الرئيسية لتحميل البيانات
+            // ============================================================
+            async function loadData() {
+                setLoading(true);
+
+                // أولاً: محاولة جلب من sessionStorage (سريع)
+                let localData = null;
                 try {
                     const stored = sessionStorage.getItem('elysium_character');
+                    if (stored) localData = JSON.parse(stored);
+                } catch (e) {}
+
+                // ثانياً: التحقق من وجود مستخدم مسجل في Firebase
+                const user = auth.currentUser;
+                let firestoreData = null;
+
+                if (user) {
+                    console.log('👤 مستخدم Firebase:', user.uid);
+                    firestoreData = await fetchUserData(user.uid);
+                } else {
+                    console.log('👤 لا يوجد مستخدم مسجل، ننتظر تغيير الحالة...');
+                    // إذا لم يكن هناك مستخدم، ننتظر تغيير الحالة (ربما المستخدم يسجل الآن)
+                    // لكننا نعرض البيانات المحلية مؤقتاً
+                }
+
+                // دمج البيانات: الأولوية لـ Firestore إذا وجدت
+                let finalData = firestoreData || localData;
+
+                // إذا لم توجد أي بيانات، نستخدم بيانات افتراضية (للتجربة)
+                if (!finalData) {
+                    // محاولة إنشاء بيانات وهمية من sessionStorage إن وجدت بشكل جزئي
+                    if (localData) {
+                        finalData = localData;
+                    } else {
+                        // بيانات افتراضية للعرض
+                        finalData = {
+                            fullName: 'أحمد الملك',
+                            icon: 'fa-crown',
+                            idNumber: '#ELY-2026-A7K3',
+                            gender: 'ذكر',
+                            age: 25,
+                            country: 'مصر',
+                            city: 'القاهرة',
+                            scenario: 'فقير',
+                            guild: 'الدولة',
+                            stats: { money: 1000, health: 80, education: 40, reputation: 50, popularity: 30,
+                                properties: 0 }
+                        };
+                        console.warn('⚠️ استخدام بيانات افتراضية (لا توجد بيانات مخزنة)');
+                    }
+                }
+
+                displayCharacterData(finalData);
+
+                // إذا لم يكن هناك مستخدم Firebase، نعرض رسالة
+                if (!user) {
+                    elements.statusBadge.innerHTML = '<i class="fas fa-circle text-[8px]"></i> غير متصل';
+                    elements.statusBadge.className = 'status-badge offline';
+                    // نضيف زر تسجيل دخول سريع
+                    const logoutBtn = elements.logoutBtn;
+                    logoutBtn.innerHTML = '<i class="fas fa-arrow-right ml-1"></i> تسجيل الدخول';
+                    logoutBtn.onclick = function() {
+                        window.location.href = 'login.html';
+                    };
+                } else {
+                    // زر الخروج يعمل
+                    elements.logoutBtn.onclick = function() {
+                        auth.signOut().then(() => {
+                            window.location.href = '../index.html';
+                        }).catch((err) => {
+                            console.error(err);
+                            alert('حدث خطأ أثناء الخروج');
+                        });
+                    };
+                }
+            }
+
+            // ============================================================
+            // 6. مراقبة حالة المصادقة (Auth State Observer)
+            // ============================================================
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    console.log('✅ المستخدم مسجل:', user.uid);
+                    // إعادة تحميل البيانات مع Firestore
+                    await loadData();
+                } else {
+                    console.log('👤 لا يوجد مستخدم مسجل.');
+                    // نعرض البيانات من sessionStorage إن وجدت
+                    const stored = sessionStorage.getItem('elysium_character');
                     if (stored) {
-                        const parsed = JSON.parse(stored);
-                        // دمج مع البيانات الافتراضية (تحديث اللاعب فقط)
-                        gameData.player = { ...gameData.player, ...parsed };
-                        // التأكد من وجود الخصائص المطلوبة
-                        if (parsed.stats) {
-                            gameData.player.money = parsed.stats.money || gameData.player.money;
-                            gameData.player.health = parsed.stats.health || gameData.player.health;
-                            gameData.player.education = parsed.stats.education || gameData.player.education;
-                            gameData.player.reputation = parsed.stats.reputation || gameData.player.reputation;
-                            gameData.player.popularity = parsed.stats.popularity || gameData.player.popularity;
-                            gameData.player.properties = parsed.stats.properties || gameData.player.properties;
+                        try {
+                            const data = JSON.parse(stored);
+                            displayCharacterData(data);
+                            // تغيير حالة البطاقة إلى "غير متصل"
+                            elements.statusBadge.innerHTML = '<i class="fas fa-circle text-[8px]"></i> غير متصل';
+                            elements.statusBadge.className = 'status-badge offline';
+                            // تعديل زر الخروج ليصبح تسجيل دخول
+                            elements.logoutBtn.innerHTML = '<i class="fas fa-arrow-right ml-1"></i> تسجيل الدخول';
+                            elements.logoutBtn.onclick = function() {
+                                window.location.href = 'login.html';
+                            };
+                            setLoading(false);
+                        } catch (e) {
+                            loadData(); // fallback
                         }
+                    } else {
+                        // لا توجد بيانات، نذهب لتسجيل الدخول
+                        window.location.href = 'login.html';
                     }
-                } catch (e) {
-                    console.warn('⚠️ لم يتم العثور على بيانات مخزنة، استخدام الافتراضية');
                 }
-                // إذا كان هناك صورة، نضعها في avatar
-                if (gameData.player.avatarImage) {
-                    gameData.player.avatar = gameData.player.avatarImage;
+            });
+
+            // ============================================================
+            // 7. بدء اللعبة (زر "ابدأ حياتك")
+            // ============================================================
+            elements.startBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                // التأكد من وجود بيانات قبل الانتقال
+                const data = sessionStorage.getItem('elysium_character');
+                if (!data) {
+                    alert('⚠️ لم يتم العثور على بيانات شخصيتك. يرجى إنشاء شخصية أولاً.');
+                    window.location.href = 'create-character.html';
+                    return;
                 }
-            }
-
-            loadPlayerData();
-
-            const p = gameData.player;
+                window.location.href = 'game.html';
+            });
 
             // ============================================================
-            // عرض بيانات اللاعب في الواجهة
+            // 8. تنفيذ التحميل الأولي
             // ============================================================
-            function renderPlayer() {
-                // الشريط الجانبي
-                const sidebarAvatar = document.getElementById('sidebarAvatar');
-                sidebarAvatar.innerHTML = '';
-                if (p.avatar) {
-                    const img = document.createElement('img');
-                    img.src = p.avatar;
-                    img.alt = 'صورة';
-                    sidebarAvatar.appendChild(img);
-                } else {
-                    const icon = document.createElement('i');
-                    icon.className = `fas ${p.icon || 'fa-crown'}`;
-                    sidebarAvatar.appendChild(icon);
-                }
-                document.getElementById('sidebarName').textContent = p.name || 'مواطن';
-                document.getElementById('sidebarRole').textContent = `مواطن · ${p.scenario || 'غير محدد'}`;
+            // نبدأ بتحميل البيانات (سيتم استدعاؤها أيضاً عند تغير حالة المصادقة)
+            loadData();
 
-                // الشريط العلوي
-                document.getElementById('topbarMoney').textContent = p.money?.toLocaleString() || '٠';
-                document.getElementById('topbarPopularity').textContent = p.popularity || '٠';
-                document.getElementById('topbarReputation').textContent = p.reputation || '٠';
-
-                // بطاقة الشخصية السريعة
-                const profileAvatar = document.getElementById('profileAvatar');
-                profileAvatar.innerHTML = '';
-                if (p.avatar) {
-                    const img = document.createElement('img');
-                    img.src = p.avatar;
-                    img.alt = 'صورة';
-                    profileAvatar.appendChild(img);
-                } else {
-                    const icon = document.createElement('i');
-                    icon.className = `fas ${p.icon || 'fa-crown'}`;
-                    profileAvatar.appendChild(icon);
-                }
-                document.getElementById('profileName').textContent = p.name || 'مواطن';
-                document.getElementById('profileSub').textContent = `مواطن · ${p.scenario || 'غير محدد'} · النقابة: ${p.guild || 'غير محددة'}`;
-                document.getElementById('pMoney').textContent = p.money?.toLocaleString() || '٠';
-                document.getElementById('pHealth').textContent = p.health || '٠';
-                document.getElementById('pEdu').textContent = p.education || '٠';
-
-                // تحديث إحصائيات العالم في البطاقات
-                renderStatsCards();
-                // تحديث الأخبار
-                renderNews();
-                // تحديث الرسوم البيانية
-                renderCharts();
-            }
-
-            // ============================================================
-            // بطاقات الإحصائيات السريعة
-            // ============================================================
-            function renderStatsCards() {
-                const w = gameData.world;
-                const grid = document.getElementById('statsGrid');
-                const items = [
-                    { icon: 'fa-flag', number: w.countries, label: 'دولة' },
-                    { icon: 'fa-users', number: w.players, label: 'لاعب نشط' },
-                    { icon: 'fa-robot', number: `${w.npcs}م`, label: 'مواطن NPC' },
-                    { icon: 'fa-crown', number: w.presidents, label: 'رئيس حالي' },
-                    { icon: 'fa-building-columns', number: `${w.gdp}ت`, label: 'ناتج محلي (تريليون)' },
-                    { icon: 'fa-percent', number: `${w.inflation}%`, label: 'التضخم' },
-                ];
-                grid.innerHTML = items.map(item => `
-                    <div class="stat-card-dash">
-                        <div class="stat-icon"><i class="fas ${item.icon}"></i></div>
-                        <div class="stat-number">${item.number}</div>
-                        <div class="stat-label">${item.label}</div>
-                    </div>
-                `).join('');
-            }
-
-            // ============================================================
-            // عرض الأخبار
-            // ============================================================
-            function renderNews() {
-                const feed = document.getElementById('newsFeed');
-                feed.innerHTML = gameData.news.map(n => `
-                    <div class="news-item">
-                        <div class="icon"><i class="fas ${n.icon}"></i></div>
-                        <div class="content">
-                            <div class="title">${n.title}</div>
-                            <div class="desc">${n.desc}</div>
-                        </div>
-                        <div class="time">${n.time}</div>
-                    </div>
-                `).join('');
-            }
-
-            // ============================================================
-            // الرسوم البيانية باستخدام Chart.js
-            // ============================================================
-            let lineChartInstance = null;
-            let doughnutChartInstance = null;
-
-            function renderCharts() {
-                // الرسم البياني الخطي (التضخم)
-                const lineCtx = document.getElementById('lineChart').getContext('2d');
-                if (lineChartInstance) lineChartInstance.destroy();
-                lineChartInstance = new Chart(lineCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
-                        datasets: [{
-                            label: 'معدل التضخم (%)',
-                            data: gameData.inflationData,
-                            borderColor: '#f0b300',
-                            backgroundColor: 'rgba(240,179,0,0.05)',
-                            fill: true,
-                            tension: 0.3,
-                            pointBackgroundColor: '#f0b300',
-                            pointBorderColor: '#0a0a0f',
-                            pointRadius: 3,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#a8a8c8', font: { family: 'Cairo' } }
-                            }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#6b6b8a', font: { family: 'Cairo' } } },
-                            y: { ticks: { color: '#6b6b8a', font: { family: 'Cairo' } } }
-                        }
-                    }
-                });
-
-                // الرسم البياني الدائري (توزيع الناتج المحلي)
-                const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
-                if (doughnutChartInstance) doughnutChartInstance.destroy();
-                const labels = Object.keys(gameData.gdpSectors);
-                const values = Object.values(gameData.gdpSectors);
-                const colors = ['#f0b300', '#d4a02a', '#b8860b'];
-                doughnutChartInstance = new Chart(doughnutCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: values,
-                            backgroundColor: colors,
-                            borderColor: '#0a0a0f',
-                            borderWidth: 2,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: { color: '#a8a8c8', font: { family: 'Cairo', size: 10 } }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // ============================================================
-            // التنقل بين علامات التبويب (Tabs)
-            // ============================================================
-            function initTabs() {
-                const tabBtns = document.querySelectorAll('.tab-btn');
-                const contents = document.querySelectorAll('.tab-content');
-
-                function switchTab(tabId) {
-                    // تحديث الأزرار
-                    tabBtns.forEach(btn => {
-                        const isActive = btn.dataset.tab === tabId;
-                        btn.classList.toggle('active', isActive);
-                    });
-                    // تحديث المحتويات
-                    contents.forEach(content => {
-                        const isActive = content.id === `tab-${tabId}`;
-                        content.classList.toggle('active', isActive);
-                    });
-                }
-
-                tabBtns.forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const tabId = this.dataset.tab;
-                        switchTab(tabId);
-                        // عند التبديل، تحديث حجم الرسوم البيانية (للرؤية)
-                        setTimeout(() => {
-                            if (lineChartInstance) lineChartInstance.resize();
-                            if (doughnutChartInstance) doughnutChartInstance.resize();
-                        }, 100);
-                    });
-                });
-
-                // التنقل عبر الشريط الجانبي (يؤدي إلى نفس التبويبات)
-                const sidebarNavItems = document.querySelectorAll('.sidebar .nav-item');
-                sidebarNavItems.forEach(item => {
-                    item.addEventListener('click', function() {
-                        const tabId = this.dataset.tab;
-                        // نبحث عن زر التبويب المناسب ونضغط عليه
-                        const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-                        if (targetBtn) {
-                            targetBtn.click();
-                            // إغلاق القائمة الجانبية في الجوال
-                            closeSidebar();
-                        }
-                        // تحديث الحالة النشطة في الشريط الجانبي
-                        sidebarNavItems.forEach(n => n.classList.remove('active'));
-                        this.classList.add('active');
-                    });
-                });
-
-                // تفعيل التبويب الأول افتراضياً
-                const firstActive = document.querySelector('.tab-btn.active');
-                if (firstActive) {
-                    switchTab(firstActive.dataset.tab);
-                }
-            }
-
-            // ============================================================
-            // التحكم بالقائمة الجانبية (للجوال)
-            // ============================================================
-            function initSidebarToggle() {
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.getElementById('sidebarOverlay');
-                const toggleBtn = document.getElementById('sidebarToggle');
-
-                function openSidebar() {
-                    sidebar.classList.add('open');
-                    overlay.classList.add('open');
-                    document.body.style.overflow = 'hidden';
-                }
-
-                function closeSidebar() {
-                    sidebar.classList.remove('open');
-                    overlay.classList.remove('open');
-                    document.body.style.overflow = '';
-                }
-
-                toggleBtn.addEventListener('click', openSidebar);
-                overlay.addEventListener('click', closeSidebar);
-
-                // إغلاق عند الضغط على أي عنصر في الشريط الجانبي (اختياري)
-                sidebar.querySelectorAll('a, button').forEach(el => {
-                    el.addEventListener('click', function(e) {
-                        // لا نغلق إذا كان الزر هو زر التبديل نفسه
-                        if (this.id === 'sidebarToggle') return;
-                        // نغلق بعد فترة قصيرة للسماح بتنفيذ الإجراء
-                        setTimeout(closeSidebar, 200);
-                    });
-                });
-
-                // إغلاق عند تغيير حجم النافذة إلى عرض أكبر من 768
-                window.addEventListener('resize', function() {
-                    if (window.innerWidth > 768) {
-                        closeSidebar();
-                    }
-                });
-            }
-
-            // ============================================================
-            // الإشعارات (مثال)
-            // ============================================================
-            function initNotifications() {
-                const notifBtn = document.getElementById('notifBtn');
-                notifBtn.addEventListener('click', function() {
-                    alert('📢 لديك ٣ إشعارات جديدة:\n- اقتربت الانتخابات\n- تقرير اقتصادي جديد\n- تحديث للعبة');
-                });
-            }
-
-            // ============================================================
-            // زر الخروج
-            // ============================================================
-            function initLogout() {
-                document.getElementById('logoutBtn').addEventListener('click', function() {
-                    if (confirm('هل تريد تسجيل الخروج؟')) {
-                        // حذف بيانات الجلسة
-                        sessionStorage.removeItem('elysium_character');
-                        window.location.href = '../index.html';
-                    }
-                });
-            }
-
-            // ============================================================
-            // تهيئة الصفحة
-            // ============================================================
-            function init() {
-                renderPlayer();
-                initTabs();
-                initSidebarToggle();
-                initNotifications();
-                initLogout();
-
-                // إعادة ضبط حجم الرسوم البيانية بعد تحميل المحتوى
-                setTimeout(() => {
-                    if (lineChartInstance) lineChartInstance.resize();
-                    if (doughnutChartInstance) doughnutChartInstance.resize();
-                }, 300);
-
-                console.log('🎮 Phase 6: Game Dashboard ready.');
-            }
-
-            // تشغيل عند تحميل DOM
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
-            }
+            console.log('🔥 Welcome page with Firebase integration ready.');
         })();
     </script>
 </body>
