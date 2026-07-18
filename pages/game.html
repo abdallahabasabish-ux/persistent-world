@@ -3,573 +3,1042 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Elysium · مرحباً بك</title>
+    <title>Elysium · العالم المستمر</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome 6 (مكتبة الأيقونات) -->
+    <!-- Font Awesome 6 (المكتبة الاحترافية للأيقونات) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Chart.js للرسوم البيانية -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
-    <!-- Firebase SDKs (v9 compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
-    </script>
 
     <style>
         /* ============================================================
-           أنماط خاصة بـ welcome مع Firebase
+           النظام البصري الفاخر (مستوحى من Apple + Notion + Steam)
            ============================================================ */
+        :root {
+            --gold: #f0b300;
+            --gold-light: #ffd866;
+            --gold-dark: #b8860b;
+            --bg-primary: #06060b;
+            --bg-secondary: #0c0c18;
+            --bg-card: rgba(18, 18, 42, 0.7);
+            --bg-card-hover: rgba(30, 30, 60, 0.7);
+            --text-primary: #f5f5fa;
+            --text-secondary: #a8a8c8;
+            --text-muted: #6b6b8a;
+            --radius: 20px;
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: #06060b;
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============================================================
+           الشريط الجانبي (Sidebar) الفاخر
+           ============================================================ */
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background: rgba(10, 10, 24, 0.95);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 16px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar .logo {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #fff;
+            text-decoration: none;
             display: flex;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            font-family: 'Cairo', sans-serif;
-            padding: 20px;
-        }
-
-        .welcome-card {
-            background: rgba(18, 18, 42, 0.75);
-            backdrop-filter: blur(32px);
-            -webkit-backdrop-filter: blur(32px);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 24px;
-            padding: 40px 36px;
-            max-width: 800px;
-            width: 100%;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
-        }
-
-        .id-card-full {
-            background: rgba(6, 6, 11, 0.8);
-            border: 1px solid rgba(240, 179, 0, 0.06);
-            border-radius: 20px;
-            padding: 24px;
-            transition: all 0.3s;
-        }
-
-        .stat-item {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 14px;
-            padding: 12px 8px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.02);
-            transition: 0.3s;
-        }
-
-        .stat-item:hover {
-            border-color: rgba(240, 179, 0, 0.05);
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        .stat-item .num {
-            font-size: 1.6rem;
-            font-weight: 900;
-            color: #ffd866;
-            transition: 0.3s;
-        }
-
-        .stat-item .label-icon {
-            font-size: 1rem;
-            margin-left: 4px;
-        }
-
-        .btn-start {
-            background: linear-gradient(135deg, #f0b300, #b8860b);
-            color: #0a0a0f;
-            font-weight: 800;
-            padding: 16px 48px;
-            border-radius: 60px;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 1.1rem;
-            display: inline-flex;
-            align-items: center;
             gap: 10px;
-            text-decoration: none;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            margin-bottom: 20px;
         }
 
-        .btn-start:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(240, 179, 0, 0.2);
+        .sidebar .logo i,
+        .sidebar .logo span {
+            background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .btn-start:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Skeleton loading */
-        .skeleton {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 8px;
-            animation: pulse 1.5s ease-in-out infinite;
-            height: 24px;
-            width: 80%;
-        }
-
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 0.4;
-            }
-            50% {
-                opacity: 0.8;
-            }
-        }
-
-        .skeleton-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.04);
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        /* تحسين العرض في الجوال */
-        @media (max-width: 640px) {
-            .welcome-card {
-                padding: 24px 16px;
-            }
-            .stat-item .num {
-                font-size: 1.2rem;
-            }
-            .btn-start {
-                padding: 14px 28px;
-                font-size: 1rem;
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* أيقونات الحالة */
-        .status-badge {
-            display: inline-flex;
+        .sidebar .nav-item {
+            display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 14px;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .sidebar .nav-item i {
+            width: 20px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .sidebar .nav-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        .sidebar .nav-item.active {
+            background: rgba(240, 179, 0, 0.06);
+            color: var(--gold-light);
+            border: 1px solid rgba(240, 179, 0, 0.04);
+        }
+
+        .sidebar .nav-item .badge {
+            margin-right: auto;
+            background: rgba(240, 179, 0, 0.1);
+            color: var(--gold-light);
+            font-size: 0.6rem;
+            padding: 2px 10px;
             border-radius: 100px;
-            font-size: 0.7rem;
             font-weight: 700;
         }
 
-        .status-badge.online {
-            background: rgba(34, 197, 94, 0.08);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.05);
+        .sidebar .user-profile {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .status-badge.offline {
-            background: rgba(239, 68, 68, 0.08);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.05);
+        .sidebar .user-profile .avatar-sm {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(240, 179, 0, 0.08);
+            border: 1px solid rgba(240, 179, 0, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--gold-light);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar .user-profile .user-info .name {
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .sidebar .user-profile .user-info .role {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        /* ============================================================
+           المحتوى الرئيسي
+           ============================================================ */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* الشريط العلوي */
+        .topbar {
+            height: 64px;
+            background: rgba(10, 10, 24, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            flex-shrink: 0;
+            gap: 16px;
+        }
+
+        .topbar .breadcrumb {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .topbar .breadcrumb span {
+            color: var(--text-primary);
+        }
+
+        .topbar .topbar-stats {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.8rem;
+        }
+        .topbar .topbar-stats .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+        }
+        .topbar .topbar-stats .stat-item i {
+            color: var(--gold);
+        }
+        .topbar .topbar-stats .stat-item .value {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .topbar .logout-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .topbar .logout-btn:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.04);
+        }
+
+        /* ============================================================
+           منطقة المحتوى
+           ============================================================ */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: radial-gradient(ellipse at 70% 20%, rgba(240, 179, 0, 0.02), transparent 50%),
+                radial-gradient(ellipse at 30% 80%, rgba(120, 80, 200, 0.01), transparent 50%),
+                var(--bg-primary);
+        }
+
+        /* ============================================================
+           البطاقات والمكونات
+           ============================================================ */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: var(--transition);
+            height: 100%;
+        }
+        .glass-card:hover {
+            border-color: rgba(240, 179, 0, 0.06);
+            background: var(--bg-card-hover);
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, #a8a8c8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 2px solid transparent;
+            font-family: 'Cairo', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+        .tab-btn.active {
+            color: var(--gold-light);
+            border-bottom-color: var(--gold);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeUp 0.4s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .news-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        .news-item .icon {
+            color: var(--gold-light);
+            opacity: 0.6;
+            font-size: 1rem;
+            margin-top: 2px;
+            width: 24px;
+            text-align: center;
+        }
+        .news-item .content {
+            flex: 1;
+        }
+        .news-item .content .title {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .news-item .content .desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .news-item .time {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .chart-wrapper {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            height: 220px;
+            position: relative;
+        }
+        .chart-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* ============================================================
+           توافق الجوال
+           ============================================================ */
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                width: 280px;
+                box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 99;
+            }
+            .sidebar-overlay.open {
+                display: block;
+            }
+            .sidebar-toggle {
+                display: block;
+            }
+            .topbar .topbar-stats {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="welcome-card" id="app">
-        <!-- Logo -->
-        <a href="../index.html" class="flex items-center justify-center gap-2 text-2xl font-black text-white no-underline mb-1">
-            <i class="fas fa-crown text-amber-400"></i>
-            <span class="bg-gradient-to-l from-amber-200 to-amber-600 bg-clip-text text-transparent">Elysium</span>
-        </a>
-        <p class="text-center text-gray-400 text-sm mb-6" id="welcomeSubtitle">
-            <i class="fas fa-spinner fa-spin ml-1"></i> جاري تحميل بياناتك...
-        </p>
-
-        <!-- ============================================================
-        بطاقة الهوية (سيتم تعبئتها بواسطة JavaScript)
-        ============================================================ -->
-        <div class="id-card-full" id="idCard">
-            <!-- الرأس: الصورة + الاسم + رقم الهوية -->
-            <div class="flex items-center gap-4 border-b border-white/5 pb-4" id="headerSection">
-                <div class="w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-4xl text-amber-400 overflow-hidden flex-shrink-0" id="avatarContainer">
-                    <i class="fas fa-crown" id="avatarIcon"></i>
-                    <img id="avatarImage" style="display:none; width:100%; height:100%; object-fit:cover;" />
-                </div>
-                <div class="flex-1 min-w-0">
-                    <h2 class="font-black text-2xl truncate" id="displayName">...</h2>
-                    <div class="flex flex-wrap items-center gap-2 mt-1">
-                        <span class="text-gray-500 text-sm" id="displayId">#ELY-2026-XXXX</span>
-                        <span class="status-badge online" id="statusBadge"><i class="fas fa-circle text-[8px]"></i> نشط</span>
-                    </div>
-                    <div class="bg-amber-500/10 text-amber-400 text-xs px-3 py-0.5 rounded-full inline-block mt-1" id="scenarioBadge">...</div>
-                </div>
-            </div>
-
-            <!-- البيانات الأساسية -->
-            <div class="grid grid-cols-3 gap-2 mt-4 text-sm" id="basicInfo">
-                <div><span class="text-gray-500 text-xs"><i class="fas fa-venus-mars ml-1"></i>الجنس</span><div id="infoGender">...</div></div>
-                <div><span class="text-gray-500 text-xs"><i class="fas fa-calendar-day ml-1"></i>العمر</span><div id="infoAge">...</div></div>
-                <div><span class="text-gray-500 text-xs"><i class="fas fa-flag ml-1"></i>الدولة</span><div id="infoCountry">...</div></div>
-            </div>
-
-            <!-- إحصائيات البداية -->
-            <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mt-6" id="statsGrid">
-                <!-- سيتم تعبئتها بواسطة JS -->
-            </div>
-
-            <!-- رسالة خطأ إن وجدت -->
-            <div id="errorMessage" class="hidden mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-2">
-                <i class="fas fa-circle-exclamation"></i>
-                <span id="errorText"></span>
-            </div>
-        </div>
-
-        <!-- أزرار الإجراءات -->
-        <div class="flex flex-col md:flex-row gap-4 justify-center mt-8">
-            <a href="game.html" class="btn-start" id="startBtn">
-                <i class="fas fa-play"></i> ابدأ حياتك
-            </a>
-            <a href="choose-scenario.html" class="text-gray-400 hover:text-white text-sm flex items-center justify-center">
-                <i class="fas fa-arrow-right ml-1"></i> عد للسيناريو
-            </a>
-            <button id="logoutBtn" class="text-gray-500 hover:text-red-400 text-sm flex items-center justify-center bg-transparent border-none cursor-pointer">
-                <i class="fas fa-right-from-bracket ml-1"></i> خروج
-            </button>
-        </div>
-    </div>
+    <!-- طبقة الإخفاء للجوال -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- ============================================================
-    JAVASCRIPT — Firebase Integration
+    الشريط الجانبي
+    ============================================================ -->
+    <aside class="sidebar" id="sidebar">
+        <a href="../index.html" class="logo"><i class="fas fa-crown"></i><span>Elysium</span></a>
+
+        <nav>
+            <button class="nav-item active" data-tab="overview"><i class="fas fa-gauge-high"></i> الرئيسية</button>
+            <button class="nav-item" data-tab="economy"><i class="fas fa-chart-line"></i> الاقتصاد</button>
+            <button class="nav-item" data-tab="politics"><i class="fas fa-landmark"></i> السياسة</button>
+            <button class="nav-item" data-tab="military"><i class="fas fa-shield-halved"></i> الجيش</button>
+            <button class="nav-item" data-tab="intel"><i class="fas fa-eye"></i> الاستخبارات</button>
+            <button class="nav-item" data-tab="media"><i class="fas fa-newspaper"></i> الإعلام</button>
+            <button class="nav-item" data-tab="profile"><i class="fas fa-user"></i> شخصيتي</button>
+        </nav>
+
+        <div class="user-profile">
+            <div class="avatar-sm" id="sidebarAvatar"><i class="fas fa-crown"></i></div>
+            <div class="user-info"><div class="name" id="sidebarName">مواطن</div><div class="role" id="sidebarRole">فقير</div></div>
+        </div>
+    </aside>
+
+    <!-- ============================================================
+    المحتوى الرئيسي
+    ============================================================ -->
+    <div class="main-content">
+
+        <!-- الشريط العلوي -->
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb"><i class="fas fa-crown" style="color:var(--gold-light);"></i> <span>لوحة القيادة</span></div>
+            </div>
+            <div class="topbar-actions" style="display:flex;align-items:center;gap:16px;">
+                <div class="topbar-stats">
+                    <div class="stat-item"><i class="fas fa-coins"></i><span class="value" id="topMoney">١٠٠٠</span></div>
+                    <div class="stat-item"><i class="fas fa-star"></i><span class="value" id="topPopularity">٣٠</span></div>
+                    <div class="stat-item"><i class="fas fa-shield"></i><span class="value" id="topReputation">٥٠</span></div>
+                </div>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-right-from-bracket"></i> خروج</button>
+            </div>
+        </header>
+
+        <!-- منطقة المحتوى -->
+        <div class="content-area" id="contentArea">
+
+            <!-- ============================================================
+            تبويب: الرئيسية (نظرة عامة)
+            ============================================================ -->
+            <div class="tab-content active" id="tab-overview">
+                <!-- بطاقات سريعة -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="worldStats">
+                    <!-- يتم تعبئتها بواسطة JS -->
+                </div>
+
+                <!-- رسمان بيانيان + أخبار -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="glass-card lg:col-span-2">
+                        <h4 class="font-bold mb-2"><i class="fas fa-chart-simple text-amber-400 ml-1"></i> مؤشر الأداء الاقتصادي</h4>
+                        <div class="chart-wrapper"><canvas id="lineChart"></canvas></div>
+                    </div>
+                    <div class="glass-card">
+                        <h4 class="font-bold mb-2"><i class="fas fa-circle-info text-amber-400 ml-1"></i> شعبية الرئيس</h4>
+                        <div class="chart-wrapper"><canvas id="doughnutChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- آخر الأخبار -->
+                <div class="glass-card">
+                    <h4 class="font-bold mb-4"><i class="fas fa-newspaper text-amber-400 ml-1"></i> آخر المستجدات</h4>
+                    <div id="newsFeed"></div>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            تبويب: الاقتصاد
+            ============================================================ -->
+            <div class="tab-content" id="tab-economy">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="glass-card"><div class="text-gray-400 text-xs">سعر الذهب</div><div class="stat-number" id="goldPrice">١,٨٩٠</div></div>
+                    <div class="glass-card"><div class="text-gray-400 text-xs">سعر النفط</div><div class="stat-number" id="oilPrice">٨٥</div></div>
+                    <div class="glass-card"><div class="text-gray-400 text-xs">معدل التضخم</div><div class="stat-number text-amber-400" id="inflationRate">٣.٢%</div></div>
+                    <div class="glass-card"><div class="text-gray-400 text-xs">الدين العام</div><div class="stat-number" id="debt">٦.٨ت</div></div>
+                </div>
+                <div class="glass-card">
+                    <h4 class="font-bold mb-2"><i class="fas fa-arrow-trend-up text-amber-400 ml-1"></i> البورصة (مؤشر Elysium)</h4>
+                    <div class="chart-wrapper" style="height:200px;"><canvas id="stockChart"></canvas></div>
+                </div>
+                <div class="glass-card mt-4 flex flex-wrap gap-4 items-center justify-between">
+                    <span><i class="fas fa-percent text-amber-400 ml-1"></i> الضريبة الحالية: <strong id="taxRate">١٥%</strong></span>
+                    <button class="px-4 py-2 bg-amber-500/10 text-amber-400 rounded-full text-sm hover:bg-amber-500/20 transition" id="adjustTaxBtn"><i class="fas fa-edit ml-1"></i> تعديل الضريبة</button>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            تبويب: السياسة
+            ============================================================ -->
+            <div class="tab-content" id="tab-politics">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="glass-card"><span class="text-gray-400 text-xs">الرئيس الحالي</span><div class="text-xl font-bold">سلطان الناصر</div></div>
+                    <div class="glass-card"><span class="text-gray-400 text-xs">الحزب الحاكم</span><div class="text-xl font-bold">حزب النهضة</div></div>
+                    <div class="glass-card"><span class="text-gray-400 text-xs">الانتخابات القادمة</span><div class="text-xl font-bold text-amber-400" id="electionCountdown">٨٤ يوماً</div></div>
+                </div>
+                <div class="glass-card">
+                    <h4 class="font-bold mb-2"><i class="fas fa-people-arrows text-amber-400 ml-1"></i> نتائج الانتخابات الأخيرة</h4>
+                    <div class="flex flex-wrap gap-6 text-sm">
+                        <div><span class="text-gray-400">حزب النهضة:</span> <strong>٦٢%</strong></div>
+                        <div><span class="text-gray-400">حزب الإصلاح:</span> <strong>٢٨%</strong></div>
+                        <div><span class="text-gray-400">المستقلون:</span> <strong>١٠%</strong></div>
+                    </div>
+                </div>
+                <div class="glass-card mt-4 flex justify-between items-center">
+                    <span><i class="fas fa-flag text-amber-400 ml-1"></i> التصويت الشعبي: <strong>٦٨%</strong> نسبة المشاركة</span>
+                    <button class="px-4 py-2 bg-amber-500/10 text-amber-400 rounded-full text-sm hover:bg-amber-500/20 transition" id="simulateElectionBtn"><i class="fas fa-vote-yea ml-1"></i> محاكاة انتخابات</button>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            تبويب: الجيش
+            ============================================================ -->
+            <div class="tab-content" id="tab-military">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="glass-card"><span class="text-gray-400 text-xs">القوات البرية</span><div class="stat-number">١٢٤,٨٠٠</div></div>
+                    <div class="glass-card"><span class="text-gray-400 text-xs">البحرية</span><div class="stat-number">٤٥,٢٠٠</div></div>
+                    <div class="glass-card"><span class="text-gray-400 text-xs">القوات الجوية</span><div class="stat-number">٢٢,٤٠٠</div></div>
+                    <div class="glass-card"><span class="text-gray-400 text-xs">الدبابات</span><div class="stat-number">١,٢٠٠</div></div>
+                </div>
+                <div class="glass-card">
+                    <h4 class="font-bold mb-2"><i class="fas fa-map-location-dot text-amber-400 ml-1"></i> الحالة الأمنية</h4>
+                    <div class="text-sm text-gray-400">الحدود الشرقية: <span class="text-green-400">مستقرة</span> | الحدود الغربية: <span class="text-yellow-400">توتر</span></div>
+                    <div class="mt-4 flex gap-4 flex-wrap">
+                        <button class="px-4 py-2 bg-red-500/10 text-red-400 rounded-full text-sm hover:bg-red-500/20 transition" id="declareWarBtn"><i class="fas fa-skull ml-1"></i> إعلان الحرب</button>
+                        <button class="px-4 py-2 bg-blue-500/10 text-blue-400 rounded-full text-sm hover:bg-blue-500/20 transition"><i class="fas fa-shield ml-1"></i> حشد قوات</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            تبويب: الاستخبارات
+            ============================================================ -->
+            <div class="tab-content" id="tab-intel">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass-card">
+                        <h4 class="font-bold"><i class="fas fa-user-secret text-amber-400 ml-1"></i> تقارير سرية</h4>
+                        <div class="text-sm text-gray-400 mt-2">⚠️ تحذير: نشاط مشبوه في المنطقة الشمالية.</div>
+                        <div class="text-sm text-gray-400">🔍 عصابة "الظلال" تخطط لتهريب أسلحة.</div>
+                    </div>
+                    <div class="glass-card">
+                        <h4 class="font-bold"><i class="fas fa-people-group text-amber-400 ml-1"></i> شبكات الجواسيس</h4>
+                        <div class="text-sm text-gray-400 mt-2">🕵️ عميل سري في حزب الإصلاح.</div>
+                        <div class="text-sm text-gray-400">📡 مراقبة القنوات الإعلامية المعادية.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            تبويب: الإعلام
+            ============================================================ -->
+            <div class="tab-content" id="tab-media">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass-card">
+                        <h4 class="font-bold"><i class="fas fa-tv text-amber-400 ml-1"></i> القنوات</h4>
+                        <div class="flex flex-col gap-2 mt-2 text-sm">
+                            <div><i class="fas fa-circle text-green-400 text-[8px] ml-1"></i> Elysium News (تأثير: <span class="text-amber-400">+٢٠%</span>)</div>
+                            <div><i class="fas fa-circle text-gray-500 text-[8px] ml-1"></i> قناة الشرق (تأثير: <span class="text-red-400">-١٠%</span>)</div>
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <h4 class="font-bold"><i class="fas fa-pen-to-square text-amber-400 ml-1"></i> نشر مقال</h4>
+                        <button class="w-full mt-2 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-full text-sm hover:bg-amber-500/20 transition" id="publishMediaBtn"><i class="fas fa-paper-plane ml-1"></i> نشر خبر (يؤثر على الشعبية)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            تبويب: الشخصية
+            ============================================================ -->
+            <div class="tab-content" id="tab-profile">
+                <div class="glass-card flex flex-col md:flex-row gap-6 items-start">
+                    <div class="w-24 h-24 rounded-full bg-amber-500/10 border-2 border-amber-500/20 flex items-center justify-center text-5xl text-amber-400 overflow-hidden flex-shrink-0" id="profileAvatar"><i class="fas fa-crown"></i></div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-black" id="profileName">مواطن</h2>
+                        <div class="flex flex-wrap gap-2 text-sm text-gray-400"><span id="profileScenario">فقير</span> · <span id="profileGuild">عام</span></div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                            <div><span class="text-gray-500 text-xs">💰 أموال</span><div class="font-bold" id="pMoney">٠</div></div>
+                            <div><span class="text-gray-500 text-xs">❤️ صحة</span><div class="font-bold" id="pHealth">٠</div></div>
+                            <div><span class="text-gray-500 text-xs">⭐ سمعة</span><div class="font-bold" id="pRep">٠</div></div>
+                            <div><span class="text-gray-500 text-xs">📢 شعبية</span><div class="font-bold" id="pPop">٠</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- end content-area -->
+    </div><!-- end main-content -->
+
+    <!-- ============================================================
+    JAVASCRIPT — المحرك الاحترافي للعالم
     ============================================================ -->
     <script>
-        (function welcomeFirebase() {
+        (function gameEngine() {
             'use strict';
 
             // ============================================================
-            // 1. تهيئة Firebase (من الإعدادات المقدمة)
+            // 1. تحميل بيانات اللاعب من sessionStorage (مع سيناريو حقيقي)
             // ============================================================
-            const firebaseConfig = {
-                apiKey: "AIzaSyASbbpibXQb4S-C6os1CkSmWYlvhtx6KMQ",
-                authDomain: "persistent-world.firebaseapp.com",
-                projectId: "persistent-world",
-                storageBucket: "persistent-world.firebasestorage.app",
-                messagingSenderId: "933145890555",
-                appId: "1:933145890555:web:598d13ef91464bb2416a5e",
-                measurementId: "G-C226NX5E2T"
-            };
+            let playerData = {};
+            try {
+                const stored = sessionStorage.getItem('elysium_character');
+                if (stored) playerData = JSON.parse(stored);
+            } catch (e) {}
 
-            // التحقق من تحميل Firebase
-            if (typeof firebase === 'undefined') {
-                console.error('❌ Firebase SDK لم يتم تحميله.');
-                document.getElementById('welcomeSubtitle').textContent = '⚠️ خطأ في تحميل Firebase';
-                return;
+            // البيانات الافتراضية في حال لم توجد
+            const defaultData = {
+                fullName: 'مواطن',
+                icon: 'fa-crown',
+                scenario: 'متوسط',
+                guild: 'عام',
+                stats: { money: 1000, health: 80, education: 40, reputation: 50, popularity: 30, properties: 0 }
+            };
+            playerData = { ...defaultData, ...playerData };
+            if (playerData.stats) {
+                playerData.stats = { ...defaultData.stats, ...playerData.stats };
+            } else {
+                playerData.stats = { ...defaultData.stats };
             }
 
-            const app = firebase.initializeApp(firebaseConfig);
-            const auth = firebase.auth();
-            const db = firebase.firestore();
+            // ============================================================
+            // 2. محاكاة حالة العالم (World State)
+            // ============================================================
+            const world = {
+                countries: 124,
+                players: 8472,
+                npcs: 14.6,
+                presidents: 23,
+                wars: 3,
+                gdp: 1.2, // تريليون
+                inflation: 3.2, // %
+                debt: 6.8, // تريليون
+                goldPrice: 1890,
+                oilPrice: 85,
+                taxRate: 15,
+                president: 'سلطان الناصر',
+                rulingParty: 'حزب النهضة',
+                electionDays: 84,
+                popularity: 62, // شعبية الرئيس
+                military: { army: 124800, navy: 45200, airforce: 22400, tanks: 1200 }
+            };
 
             // ============================================================
-            // 2. دوال مساعدة للعرض
+            // 3. محاكاة تأثير السيناريو على بيانات اللاعب
             // ============================================================
-            const elements = {
-                subtitle: document.getElementById('welcomeSubtitle'),
-                avatarContainer: document.getElementById('avatarContainer'),
-                avatarIcon: document.getElementById('avatarIcon'),
-                avatarImage: document.getElementById('avatarImage'),
-                displayName: document.getElementById('displayName'),
-                displayId: document.getElementById('displayId'),
-                statusBadge: document.getElementById('statusBadge'),
-                scenarioBadge: document.getElementById('scenarioBadge'),
-                infoGender: document.getElementById('infoGender'),
-                infoAge: document.getElementById('infoAge'),
-                infoCountry: document.getElementById('infoCountry'),
-                statsGrid: document.getElementById('statsGrid'),
-                errorMessage: document.getElementById('errorMessage'),
-                errorText: document.getElementById('errorText'),
-                startBtn: document.getElementById('startBtn'),
-                logoutBtn: document.getElementById('logoutBtn'),
-            };
+            function applyScenarioEffects() {
+                const sc = playerData.scenario;
+                const s = playerData.stats;
+                // تعديل الإحصائيات حسب السيناريو (منطق حقيقي)
+                switch (sc) {
+                    case 'فقير':
+                        s.money = 200;
+                        s.health = 60;
+                        s.reputation = 30;
+                        s.popularity = 20;
+                        s.education = 20;
+                        break;
+                    case 'غني':
+                        s.money = 50000;
+                        s.health = 90;
+                        s.reputation = 70;
+                        s.popularity = 50;
+                        s.education = 60;
+                        break;
+                    case 'طالب':
+                        s.money = 100;
+                        s.health = 85;
+                        s.reputation = 40;
+                        s.popularity = 35;
+                        s.education = 85;
+                        break;
+                    case 'طبيب':
+                        s.money = 8000;
+                        s.health = 95;
+                        s.reputation = 85;
+                        s.popularity = 70;
+                        s.education = 90;
+                        break;
+                    case 'سياسي':
+                        s.money = 4000;
+                        s.health = 75;
+                        s.reputation = 60;
+                        s.popularity = 75;
+                        s.education = 70;
+                        break;
+                    case 'مجرم':
+                        s.money = 5000;
+                        s.health = 70;
+                        s.reputation = 15;
+                        s.popularity = 10;
+                        s.education = 30;
+                        break;
+                    default:
+                        // متوسط
+                        s.money = 1000;
+                        s.health = 80;
+                        s.reputation = 50;
+                        s.popularity = 30;
+                        s.education = 40;
+                }
+                // حفظ التعديلات
+                playerData.stats = s;
+                sessionStorage.setItem('elysium_character', JSON.stringify(playerData));
+            }
+            applyScenarioEffects();
 
-            // تعريف أيقونات الإحصائيات
-            const statIcons = {
-                money: 'fa-coins',
-                health: 'fa-heart',
-                education: 'fa-graduation-cap',
-                reputation: 'fa-star',
-                popularity: 'fa-user-group',
-                properties: 'fa-building'
-            };
+            // ============================================================
+            // 4. دوال عرض البيانات (UI Render)
+            // ============================================================
+            const p = playerData;
+            const s = p.stats;
 
-            const statLabels = {
-                money: 'أموال',
-                health: 'صحة',
-                education: 'تعليم',
-                reputation: 'سمعة',
-                popularity: 'شعبية',
-                properties: 'ممتلكات'
-            };
+            // الشريط الجانبي
+            document.getElementById('sidebarName').textContent = p.fullName;
+            document.getElementById('sidebarRole').textContent = p.scenario;
+            const sa = document.getElementById('sidebarAvatar');
+            if (p.avatarImage) { sa.innerHTML = `<img src="${p.avatarImage}" class="w-full h-full object-cover" />`; } else { sa
+                    .innerHTML = `<i class="fas ${p.icon}"></i>`; }
 
-            function renderStats(stats) {
-                if (!stats) stats = {};
-                const defaultStats = { money: 0, health: 0, education: 0, reputation: 0, popularity: 0, properties: 0 };
-                const s = { ...defaultStats, ...stats };
+            // الشريط العلوي
+            document.getElementById('topMoney').textContent = s.money?.toLocaleString() || '٠';
+            document.getElementById('topPopularity').textContent = s.popularity || '٠';
+            document.getElementById('topReputation').textContent = s.reputation || '٠';
 
-                elements.statsGrid.innerHTML = Object.keys(statIcons).map(key => `
-                    <div class="stat-item">
-                        <div class="num">${s[key]?.toLocaleString?.() || s[key] || '٠'}</div>
-                        <div class="text-gray-500 text-xs">
-                            <i class="fas ${statIcons[key]} label-icon"></i>
-                            ${statLabels[key]}
-                        </div>
+            // تبويب الشخصية
+            const pa = document.getElementById('profileAvatar');
+            if (p.avatarImage) { pa.innerHTML = `<img src="${p.avatarImage}" class="w-full h-full object-cover" />`; } else { pa
+                    .innerHTML = `<i class="fas ${p.icon}"></i>`; }
+            document.getElementById('profileName').textContent = p.fullName;
+            document.getElementById('profileScenario').textContent = p.scenario;
+            document.getElementById('profileGuild').textContent = p.guild;
+            document.getElementById('pMoney').textContent = s.money?.toLocaleString() || '٠';
+            document.getElementById('pHealth').textContent = s.health || '٠';
+            document.getElementById('pRep').textContent = s.reputation || '٠';
+            document.getElementById('pPop').textContent = s.popularity || '٠';
+
+            // إحصائيات العالم
+            function renderWorldStats() {
+                const grid = document.getElementById('worldStats');
+                const items = [
+                    { icon: 'fa-flag', num: world.countries, label: 'دولة' },
+                    { icon: 'fa-users', num: world.players, label: 'لاعب نشط' },
+                    { icon: 'fa-robot', num: `${world.npcs}م`, label: 'مواطن NPC' },
+                    { icon: 'fa-crown', num: world.presidents, label: 'رئيس حالي' },
+                    { icon: 'fa-building-columns', num: `${world.gdp}ت`, label: 'ناتج محلي' },
+                    { icon: 'fa-percent', num: `${world.inflation}%`, label: 'تضخم' },
+                ];
+                grid.innerHTML = items.map(i => `
+                    <div class="glass-card text-center">
+                        <div class="text-amber-400 text-xl"><i class="fas ${i.icon}"></i></div>
+                        <div class="stat-number text-2xl">${i.num}</div>
+                        <div class="text-gray-500 text-xs">${i.label}</div>
                     </div>
                 `).join('');
             }
+            renderWorldStats();
 
-            function showError(msg) {
-                elements.errorMessage.classList.remove('hidden');
-                elements.errorText.textContent = msg;
-            }
+            // الأخبار (ديناميكية)
+            const newsPool = [
+                { icon: 'fa-crown', title: 'الرئيس يعلن عن حزمة تحفيز اقتصادي', desc: 'سيتم ضخ ٢٠٠ مليون', time: 'الآن' },
+                { icon: 'fa-landmark', title: 'البرلمان يوافق على قانون الضرائب', desc: 'نسبة الضريبة ترتفع إلى ١٨٪',
+                time: 'منذ ساعة' },
+                { icon: 'fa-shield-halved', title: 'مناورات عسكرية على الحدود', desc: 'مشاركة ١٢٠٠ جندي', time: 'منذ ٣ س' },
+                { icon: 'fa-chart-line', title: 'البورصة تغلق على ارتفاع', desc: 'قطاع التكنولوجيا يقود المكاسب',
+                time: 'منذ ٥ س' },
+                { icon: 'fa-seedling', title: 'موسم الحصاد يبدأ', desc: 'توقعات بمحصول قياسي', time: 'منذ يوم' },
+                { icon: 'fa-skull', title: 'اشتباكات حدودية', desc: 'قوات الجيش تتصدى لهجوم', time: 'منذ ٢ س' },
+                { icon: 'fa-user-secret', title: 'تقارير استخباراتية', desc: 'رصد تحركات مشبوهة', time: 'منذ ٤ س' },
+            ];
+            let newsIndex = 0;
 
-            function hideError() {
-                elements.errorMessage.classList.add('hidden');
-            }
-
-            function setLoading(state) {
-                if (state) {
-                    elements.subtitle.innerHTML = '<i class="fas fa-spinner fa-spin ml-1"></i> جاري تحميل بياناتك...';
-                    elements.startBtn.disabled = true;
-                } else {
-                    elements.subtitle.textContent = 'مرحباً بك في عالمك الجديد';
-                    elements.startBtn.disabled = false;
+            function renderNews() {
+                const feed = document.getElementById('newsFeed');
+                // عرض ٣ أخبار مع دوران
+                const displayed = [];
+                for (let i = 0; i < 4; i++) {
+                    const idx = (newsIndex + i) % newsPool.length;
+                    displayed.push(newsPool[idx]);
                 }
+                feed.innerHTML = displayed.map(n => `
+                    <div class="news-item">
+                        <div class="icon"><i class="fas ${n.icon}"></i></div>
+                        <div class="content"><div class="title">${n.title}</div><div class="desc">${n.desc}</div></div>
+                        <div class="time">${n.time}</div>
+                    </div>
+                `).join('');
+                newsIndex = (newsIndex + 1) % newsPool.length;
             }
+            renderNews();
+            setInterval(renderNews, 8000);
 
             // ============================================================
-            // 3. عرض البيانات (من Firebase أو sessionStorage)
+            // 5. الرسوم البيانية (Chart.js)
             // ============================================================
-            function displayCharacterData(data) {
-                if (!data) {
-                    showError('لا توجد بيانات شخصية. يرجى إنشاء شخصية أولاً.');
-                    setLoading(false);
-                    return;
-                }
+            // مؤشر الأداء الاقتصادي (بيانات شهرية)
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+            let lineChart = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                    datasets: [{
+                        label: 'الناتج المحلي (تريليون)',
+                        data: [1.0, 1.1, 1.15, 1.2, 1.18, 1.2],
+                        borderColor: '#f0b300',
+                        backgroundColor: 'rgba(240,179,0,0.05)',
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#f0b300',
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#a8a8c8',
+                                font: { family: 'Cairo' } } } }, scales: { x: { ticks: { color: '#6b6b8a',
+                            font: { family: 'Cairo' } } }, y: { ticks: { color: '#6b6b8a', font: { family: 'Cairo' } } } } }
+            });
 
-                hideError();
+            // شعبية الرئيس (دائرية)
+            const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+            let doughnutChart = new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['تأييد', 'معارضة'],
+                    datasets: [{ data: [world.popularity, 100 - world.popularity], backgroundColor: ['#f0b300',
+                            'rgba(255,255,255,0.05)'
+                        ], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom',
+                            labels: { color: '#a8a8c8', font: { family: 'Cairo', size: 10 } } } } }
+            });
 
-                // الصورة الرمزية
-                if (data.avatarImage) {
-                    elements.avatarIcon.style.display = 'none';
-                    elements.avatarImage.style.display = 'block';
-                    elements.avatarImage.src = data.avatarImage;
-                } else {
-                    elements.avatarIcon.style.display = 'block';
-                    elements.avatarImage.style.display = 'none';
-                    elements.avatarIcon.className = `fas ${data.icon || 'fa-crown'}`;
-                }
+            // البورصة (خط متغير)
+            const ctxStock = document.getElementById('stockChart').getContext('2d');
+            new Chart(ctxStock, {
+                type: 'line',
+                data: {
+                    labels: ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00'],
+                    datasets: [{ label: 'مؤشر Elysium', data: [1200, 1215, 1208, 1225, 1230, 1245], borderColor: '#4ade80',
+                        backgroundColor: 'rgba(74,222,128,0.05)', fill: true, tension: 0.3, pointRadius: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#a8a8c8',
+                                font: { family: 'Cairo' } } } }, scales: { x: { ticks: { color: '#6b6b8a',
+                            font: { family: 'Cairo' } } }, y: { ticks: { color: '#6b6b8a', font: { family: 'Cairo' } } } } }
+            });
 
-                // الاسم ورقم الهوية
-                elements.displayName.textContent = data.fullName || 'مواطن';
-                elements.displayId.textContent = data.idNumber || '#ELY-2026-XXXX';
-
-                // حالة الاتصال (نشط دائماً)
-                elements.statusBadge.innerHTML = '<i class="fas fa-circle text-[8px]"></i> نشط';
-                elements.statusBadge.className = 'status-badge online';
-
-                // السيناريو
-                elements.scenarioBadge.textContent = data.scenario || 'غير محدد';
-
-                // البيانات الأساسية
-                elements.infoGender.textContent = data.gender || 'غير محدد';
-                elements.infoAge.textContent = data.age ? `${data.age} سنة` : 'غير محدد';
-                elements.infoCountry.textContent = data.country || 'غير محدد';
-
-                // الإحصائيات
-                const stats = data.stats || {};
-                renderStats(stats);
-
-                // حفظ البيانات في sessionStorage للاستخدام في الصفحات التالية
-                sessionStorage.setItem('elysium_character', JSON.stringify(data));
-
-                setLoading(false);
-            }
+            // تحديث بيانات الاقتصاد
+            document.getElementById('goldPrice').textContent = `١,${world.goldPrice}`;
+            document.getElementById('oilPrice').textContent = world.oilPrice;
+            document.getElementById('inflationRate').textContent = `${world.inflation}%`;
+            document.getElementById('debt').textContent = `${world.debt}ت`;
+            document.getElementById('taxRate').textContent = `${world.taxRate}%`;
+            document.getElementById('electionCountdown').textContent = `${world.electionDays} يوماً`;
 
             // ============================================================
-            // 4. جلب البيانات من Firestore
+            // 6. التفاعلات والمحاكاة (الأحداث الحقيقية)
             // ============================================================
-            async function fetchUserData(uid) {
-                try {
-                    const docRef = db.collection('users').doc(uid);
-                    const doc = await docRef.get();
-                    if (doc.exists) {
-                        const data = doc.data();
-                        // تحويل البيانات إلى الصيغة المطلوبة
-                        const charData = {
-                            fullName: data.displayName || data.fullName || 'مواطن',
-                            avatarImage: data.photoURL || data.avatarImage || null,
-                            icon: data.icon || 'fa-crown',
-                            idNumber: data.idNumber || '#ELY-2026-' + Math.random().toString(36).substring(2, 6)
-                                .toUpperCase(),
-                            gender: data.gender || 'غير محدد',
-                            age: data.age || 25,
-                            country: data.country || 'غير محدد',
-                            city: data.city || 'غير محدد',
-                            scenario: data.scenario || 'متوسط',
-                            guild: data.guild || 'عام',
-                            stats: data.stats || {
-                                money: 1000,
-                                health: 80,
-                                education: 40,
-                                reputation: 50,
-                                popularity: 30,
-                                properties: 0
-                            }
-                        };
-                        return charData;
+
+            // تعديل الضريبة (يؤثر على الاقتصاد والشعبية)
+            document.getElementById('adjustTaxBtn').addEventListener('click', function() {
+                const newTax = prompt('أدخل نسبة الضريبة الجديدة (٥-٣٠):', world.taxRate);
+                if (newTax !== null) {
+                    const val = parseFloat(newTax);
+                    if (val >= 5 && val <= 30) {
+                        world.taxRate = val;
+                        document.getElementById('taxRate').textContent = `${val}%`;
+                        // تأثير: ارتفاع الضريبة يخفض الشعبية
+                        const impact = (val - 15) * 1.5;
+                        world.popularity = Math.max(10, Math.min(90, world.popularity - impact));
+                        // تحديث الرسم الدائري
+                        doughnutChart.data.datasets[0].data = [world.popularity, 100 - world.popularity];
+                        doughnutChart.update();
+                        alert(`✅ تم تعديل الضريبة إلى ${val}%. تأثرت شعبية الرئيس.`);
+                        // إضافة خبر
+                        newsPool.unshift({ icon: 'fa-percent', title: `تعديل الضريبة إلى ${val}%`,
+                            desc: 'قرار حكومي جديد يثير الجدل', time: 'الآن' });
+                        renderNews();
                     } else {
-                        console.warn('⚠️ لا توجد وثيقة للمستخدم في Firestore، استخدام sessionStorage.');
-                        return null;
-                    }
-                } catch (error) {
-                    console.warn('⚠️ خطأ في قراءة Firestore:', error);
-                    return null;
-                }
-            }
-
-            // ============================================================
-            // 5. الوظيفة الرئيسية لتحميل البيانات
-            // ============================================================
-            async function loadData() {
-                setLoading(true);
-
-                // أولاً: محاولة جلب من sessionStorage (سريع)
-                let localData = null;
-                try {
-                    const stored = sessionStorage.getItem('elysium_character');
-                    if (stored) localData = JSON.parse(stored);
-                } catch (e) {}
-
-                // ثانياً: التحقق من وجود مستخدم مسجل في Firebase
-                const user = auth.currentUser;
-                let firestoreData = null;
-
-                if (user) {
-                    console.log('👤 مستخدم Firebase:', user.uid);
-                    firestoreData = await fetchUserData(user.uid);
-                } else {
-                    console.log('👤 لا يوجد مستخدم مسجل، ننتظر تغيير الحالة...');
-                    // إذا لم يكن هناك مستخدم، ننتظر تغيير الحالة (ربما المستخدم يسجل الآن)
-                    // لكننا نعرض البيانات المحلية مؤقتاً
-                }
-
-                // دمج البيانات: الأولوية لـ Firestore إذا وجدت
-                let finalData = firestoreData || localData;
-
-                // إذا لم توجد أي بيانات، نستخدم بيانات افتراضية (للتجربة)
-                if (!finalData) {
-                    // محاولة إنشاء بيانات وهمية من sessionStorage إن وجدت بشكل جزئي
-                    if (localData) {
-                        finalData = localData;
-                    } else {
-                        // بيانات افتراضية للعرض
-                        finalData = {
-                            fullName: 'أحمد الملك',
-                            icon: 'fa-crown',
-                            idNumber: '#ELY-2026-A7K3',
-                            gender: 'ذكر',
-                            age: 25,
-                            country: 'مصر',
-                            city: 'القاهرة',
-                            scenario: 'فقير',
-                            guild: 'الدولة',
-                            stats: { money: 1000, health: 80, education: 40, reputation: 50, popularity: 30,
-                                properties: 0 }
-                        };
-                        console.warn('⚠️ استخدام بيانات افتراضية (لا توجد بيانات مخزنة)');
-                    }
-                }
-
-                displayCharacterData(finalData);
-
-                // إذا لم يكن هناك مستخدم Firebase، نعرض رسالة
-                if (!user) {
-                    elements.statusBadge.innerHTML = '<i class="fas fa-circle text-[8px]"></i> غير متصل';
-                    elements.statusBadge.className = 'status-badge offline';
-                    // نضيف زر تسجيل دخول سريع
-                    const logoutBtn = elements.logoutBtn;
-                    logoutBtn.innerHTML = '<i class="fas fa-arrow-right ml-1"></i> تسجيل الدخول';
-                    logoutBtn.onclick = function() {
-                        window.location.href = 'login.html';
-                    };
-                } else {
-                    // زر الخروج يعمل
-                    elements.logoutBtn.onclick = function() {
-                        auth.signOut().then(() => {
-                            window.location.href = '../index.html';
-                        }).catch((err) => {
-                            console.error(err);
-                            alert('حدث خطأ أثناء الخروج');
-                        });
-                    };
-                }
-            }
-
-            // ============================================================
-            // 6. مراقبة حالة المصادقة (Auth State Observer)
-            // ============================================================
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    console.log('✅ المستخدم مسجل:', user.uid);
-                    // إعادة تحميل البيانات مع Firestore
-                    await loadData();
-                } else {
-                    console.log('👤 لا يوجد مستخدم مسجل.');
-                    // نعرض البيانات من sessionStorage إن وجدت
-                    const stored = sessionStorage.getItem('elysium_character');
-                    if (stored) {
-                        try {
-                            const data = JSON.parse(stored);
-                            displayCharacterData(data);
-                            // تغيير حالة البطاقة إلى "غير متصل"
-                            elements.statusBadge.innerHTML = '<i class="fas fa-circle text-[8px]"></i> غير متصل';
-                            elements.statusBadge.className = 'status-badge offline';
-                            // تعديل زر الخروج ليصبح تسجيل دخول
-                            elements.logoutBtn.innerHTML = '<i class="fas fa-arrow-right ml-1"></i> تسجيل الدخول';
-                            elements.logoutBtn.onclick = function() {
-                                window.location.href = 'login.html';
-                            };
-                            setLoading(false);
-                        } catch (e) {
-                            loadData(); // fallback
-                        }
-                    } else {
-                        // لا توجد بيانات، نذهب لتسجيل الدخول
-                        window.location.href = 'login.html';
+                        alert('الرجاء إدخال قيمة بين ٥ و ٣٠.');
                     }
                 }
             });
 
-            // ============================================================
-            // 7. بدء اللعبة (زر "ابدأ حياتك")
-            // ============================================================
-            elements.startBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                // التأكد من وجود بيانات قبل الانتقال
-                const data = sessionStorage.getItem('elysium_character');
-                if (!data) {
-                    alert('⚠️ لم يتم العثور على بيانات شخصيتك. يرجى إنشاء شخصية أولاً.');
-                    window.location.href = 'create-character.html';
-                    return;
+            // محاكاة انتخابات
+            document.getElementById('simulateElectionBtn').addEventListener('click', function() {
+                const pop = world.popularity;
+                const result = pop > 50 ? 'فوز حزب النهضة' : 'فوز حزب الإصلاح';
+                alert(`🗳️ نتائج الانتخابات: ${result}\nشعبية الرئيس الحالية: ${pop}%`);
+                // تحديث الرئيس إذا خسر
+                if (pop < 50) {
+                    world.president = 'خالد السالم';
+                    document.querySelector('#tab-politics .glass-card .text-xl.font-bold').textContent = world
+                        .president;
+                    alert('🔄 تم تغيير الرئيس!');
                 }
-                window.location.href = 'game.html';
+                // تغيير عشوائي للشعبية
+                world.popularity = Math.max(20, Math.min(80, world.popularity + Math.floor(Math.random() * 20) - 10));
+                doughnutChart.data.datasets[0].data = [world.popularity, 100 - world.popularity];
+                doughnutChart.update();
+            });
+
+            // إعلان الحرب (تأثير كارثي على الاقتصاد)
+            document.getElementById('declareWarBtn').addEventListener('click', function() {
+                if (confirm('⚔️ هل أنت متأكد من إعلان الحرب؟ ستتأثر الاقتصاد والشعبية بشدة.')) {
+                    world.wars += 1;
+                    world.gdp = Math.max(0.5, world.gdp - 0.2);
+                    world.inflation += 2.5;
+                    world.popularity = Math.max(15, world.popularity + 5); // حرب ترفع الشعبية مؤقتاً
+                    // تحديث البطاقات
+                    renderWorldStats();
+                    document.getElementById('inflationRate').textContent = `${world.inflation.toFixed(1)}%`;
+                    alert(`🔥 تم إعلان الحرب! عدد الحروب: ${world.wars}\nالناتج المحلي انخفض إلى ${world.gdp.toFixed(1)}ت`);
+                    // تحديث الرسم الخطي
+                    const newData = lineChart.data.datasets[0].data;
+                    newData.push(newData[newData.length - 1] - 0.1);
+                    newData.shift();
+                    lineChart.update();
+                    // إضافة خبر
+                    newsPool.unshift({ icon: 'fa-skull', title: '⚔️ إعلان الحرب!', desc: 'الرئيس يعلن التعبئة العامة',
+                        time: 'الآن' });
+                    renderNews();
+                }
+            });
+
+            // نشر مقال إعلامي
+            document.getElementById('publishMediaBtn').addEventListener('click', function() {
+                const gain = Math.floor(Math.random() * 10) + 5;
+                world.popularity = Math.min(95, world.popularity + gain);
+                doughnutChart.data.datasets[0].data = [world.popularity, 100 - world.popularity];
+                doughnutChart.update();
+                alert(`📰 تم نشر المقال! زيادة الشعبية بنسبة ${gain}%.`);
+                newsPool.unshift({ icon: 'fa-newspaper', title: 'مقال جديد يهز الأوساط', desc: 'تأثير إيجابي على الرئيس',
+                    time: 'الآن' });
+                renderNews();
             });
 
             // ============================================================
-            // 8. تنفيذ التحميل الأولي
+            // 7. التنقل (Tabs + Sidebar)
             // ============================================================
-            // نبدأ بتحميل البيانات (سيتم استدعاؤها أيضاً عند تغير حالة المصادقة)
-            loadData();
+            function switchTab(tabId) {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                const target = document.getElementById(`tab-${tabId}`);
+                if (target) target.classList.add('active');
 
-            console.log('🔥 Welcome page with Firebase integration ready.');
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                document.querySelector(`.nav-item[data-tab="${tabId}"]`)?.classList.add('active');
+
+                // إعادة رسم الرسوم البيانية
+                setTimeout(() => { lineChart.resize();
+                    doughnutChart.resize(); }, 100);
+            }
+
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                    closeSidebar();
+                });
+            });
+
+            // ============================================================
+            // 8. التحكم بالقائمة الجانبية (جوال)
+            // ============================================================
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.getElementById('sidebarToggle');
+
+            function openSidebar() { sidebar.classList.add('open');
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; }
+
+            function closeSidebar() { sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+                document.body.style.overflow = ''; }
+
+            toggleBtn.addEventListener('click', openSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // ============================================================
+            // 9. زر الخروج
+            // ============================================================
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('هل تريد تسجيل الخروج؟')) {
+                    sessionStorage.removeItem('elysium_character');
+                    window.location.href = '../index.html';
+                }
+            });
+
+            // ============================================================
+            // 10. محاكاة تطور العالم (تحديث دوري)
+            // ============================================================
+            setInterval(() => {
+                // تغيرات طفيفة في الاقتصاد
+                world.inflation = Math.max(0.5, world.inflation + (Math.random() - 0.5) * 0.3);
+                world.gdp = Math.max(0.5, world.gdp + (Math.random() - 0.48) * 0.02);
+                world.popularity = Math.max(20, Math.min(85, world.popularity + (Math.random() - 0.5) * 2));
+                world.electionDays = Math.max(0, world.electionDays - 1);
+
+                // تحديث العرض
+                document.getElementById('inflationRate').textContent = `${world.inflation.toFixed(1)}%`;
+                document.getElementById('electionCountdown').textContent = `${world.electionDays} يوماً`;
+                doughnutChart.data.datasets[0].data = [world.popularity, 100 - world.popularity];
+                doughnutChart.update();
+
+                // تجديد الأخبار العاجلة كل 30 ثانية
+                if (Math.random() > 0.7) {
+                    const events = [
+                        { icon: 'fa-chart-line', title: 'تقلبات في البورصة', desc: 'انخفاض مفاجئ في الأسهم' },
+                        { icon: 'fa-users', title: 'مظاهرات في العاصمة', desc: 'مواطنون يطالبون بإصلاحات' },
+                        { icon: 'fa-shield-halved', title: 'اشتباك حدودي', desc: 'قوات الجيش تتصدى لتسلل' },
+                    ];
+                    const ev = events[Math.floor(Math.random() * events.length)];
+                    newsPool.unshift({ ...ev, time: 'الآن' });
+                    renderNews();
+                }
+            }, 5000);
+
+            console.log('🚀 Elysium Game Engine initialized.');
+            console.log('👤 Player:', p.fullName, '| Scenario:', p.scenario);
+            console.log('🌍 World State:', world);
         })();
     </script>
 </body>
