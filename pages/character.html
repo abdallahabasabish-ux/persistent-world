@@ -9,14 +9,14 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com">
     </script>
-    <!-- Font Awesome -->
+    <!-- Font Awesome 6 (Free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
 
     <style>
         /* ============================================================
-           CSS CUSTOM — Character Creation System
+           CSS CUSTOM — Character Creation v3 (Profile Upload + All Guilds)
            ============================================================ */
         :root {
             --gold: #f0b300;
@@ -50,7 +50,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ---------- Animated Background ---------- */
         .char-bg {
             position: fixed;
             inset: 0;
@@ -100,7 +99,6 @@
             }
         }
 
-        /* ---------- Particles ---------- */
         #char-particles {
             position: fixed;
             inset: 0;
@@ -108,12 +106,11 @@
             pointer-events: none;
         }
 
-        /* ---------- Main Container ---------- */
         .char-container {
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 720px;
+            max-width: 760px;
             margin: 0 auto;
         }
 
@@ -128,7 +125,6 @@
             transition: var(--transition);
         }
 
-        /* ---------- Header ---------- */
         .char-header {
             text-align: center;
             margin-bottom: 32px;
@@ -186,7 +182,6 @@
             border-radius: 10px;
         }
 
-        /* ---------- Form ---------- */
         .char-form {
             display: flex;
             flex-direction: column;
@@ -271,38 +266,157 @@
             color: #fff;
         }
 
-        /* ---------- Avatar Picker ---------- */
+        /* ============================================================
+           PROFILE UPLOAD — صورة شخصية
+           ============================================================ */
+        .profile-upload-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .profile-upload-box {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.10);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .profile-upload-box:hover {
+            border-color: rgba(240, 179, 0, 0.2);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .profile-upload-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            inset: 0;
+        }
+
+        .profile-upload-box .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 0.55rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.2;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .profile-upload-box .placeholder i {
+            font-size: 1.8rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .profile-upload-box.has-image .placeholder {
+            display: none;
+        }
+
+        .profile-upload-box.has-image {
+            border-color: rgba(240, 179, 0, 0.15);
+            border-style: solid;
+        }
+
+        .profile-upload-box .remove-img {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.9);
+            border: 2px solid var(--bg-primary);
+            color: #fff;
+            font-size: 0.6rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5;
+            transition: var(--transition);
+        }
+
+        .profile-upload-box.has-image .remove-img {
+            display: flex;
+        }
+
+        .profile-upload-box .remove-img:hover {
+            transform: scale(1.1);
+            background: #ef4444;
+        }
+
+        .profile-upload-hint {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* ============================================================
+           PREMIUM AVATAR GRID — جميع النقابات
+           ============================================================ */
         .avatar-grid {
             display: flex;
-            gap: 12px;
             flex-wrap: wrap;
+            gap: 12px;
             margin-top: 4px;
         }
 
         .avatar-option {
-            width: 56px;
-            height: 56px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            background: rgba(255, 255, 255, 0.03);
+            font-size: 1.4rem;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.00));
             border: 2px solid rgba(255, 255, 255, 0.04);
             cursor: pointer;
             transition: var(--transition);
             position: relative;
+            color: var(--text-secondary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .avatar-option i {
+            font-size: 1.5rem;
+            transition: var(--transition);
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
 
         .avatar-option:hover {
-            transform: scale(1.08);
-            border-color: rgba(240, 179, 0, 0.2);
+            transform: translateY(-4px) scale(1.05);
+            border-color: rgba(240, 179, 0, 0.15);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
 
         .avatar-option.selected {
             border-color: var(--gold);
-            background: rgba(240, 179, 0, 0.08);
-            box-shadow: 0 0 30px rgba(240, 179, 0, 0.08);
+            box-shadow: 0 0 30px rgba(240, 179, 0, 0.12), inset 0 0 30px rgba(240, 179, 0, 0.02);
+            transform: translateY(-4px) scale(1.05);
+        }
+
+        .avatar-option.selected i {
+            color: var(--gold-light);
+            filter: drop-shadow(0 0 12px rgba(240, 179, 0, 0.3));
         }
 
         .avatar-option.selected::after {
@@ -316,10 +430,57 @@
             background: var(--gold);
             color: #0a0a0f;
             border-radius: 50%;
-            padding: 2px 4px;
+            padding: 2px 5px;
+            box-shadow: 0 0 20px rgba(240, 179, 0, 0.3);
         }
 
-        /* ---------- Buttons ---------- */
+        /* خلفيات فاخرة حسب القطاع */
+        .avatar-option[data-guild="state"] {
+            background: linear-gradient(145deg, #2a1f0a, #1a1206);
+        }
+        .avatar-option[data-guild="politics"] {
+            background: linear-gradient(145deg, #1a1a2e, #0e0e1a);
+        }
+        .avatar-option[data-guild="business"] {
+            background: linear-gradient(145deg, #0f1a2a, #080e18);
+        }
+        .avatar-option[data-guild="education"] {
+            background: linear-gradient(145deg, #14201a, #0a140e);
+        }
+        .avatar-option[data-guild="health"] {
+            background: linear-gradient(145deg, #0a1f1a, #06120e);
+        }
+        .avatar-option[data-guild="engineering"] {
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+        }
+        .avatar-option[data-guild="agriculture"] {
+            background: linear-gradient(145deg, #142010, #0a1408);
+        }
+        .avatar-option[data-guild="media"] {
+            background: linear-gradient(145deg, #1e1420, #0f0a10);
+        }
+        .avatar-option[data-guild="military"] {
+            background: linear-gradient(145deg, #1a1a2e, #0e0e1a);
+        }
+        .avatar-option[data-guild="justice"] {
+            background: linear-gradient(145deg, #1a1a0a, #0f0f06);
+        }
+        .avatar-option[data-guild="finance"] {
+            background: linear-gradient(145deg, #0a1a1a, #060e0e);
+        }
+        .avatar-option[data-guild="security"] {
+            background: linear-gradient(145deg, #1a0f1a, #0e060e);
+        }
+        .avatar-option[data-guild="transport"] {
+            background: linear-gradient(145deg, #1a1a14, #0e0e0a);
+        }
+        .avatar-option[data-guild="art"] {
+            background: linear-gradient(145deg, #1a0f14, #0e060a);
+        }
+
+        /* ============================================================
+           BUTTONS
+           ============================================================ */
         .btn-char {
             width: 100%;
             padding: 16px;
@@ -363,11 +524,13 @@
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
         }
 
-        /* ---------- Digital ID Card ---------- */
+        /* ============================================================
+           ID CARD
+           ============================================================ */
         .id-card {
             display: none;
             margin-top: 28px;
-            background: linear-gradient(145deg, rgba(18, 18, 42, 0.9), rgba(6, 6, 11, 0.95));
+            background: linear-gradient(145deg, rgba(18, 18, 42, 0.95), rgba(6, 6, 11, 0.98));
             border: 1px solid rgba(240, 179, 0, 0.1);
             border-radius: 20px;
             padding: 28px 24px;
@@ -416,13 +579,29 @@
             width: 72px;
             height: 72px;
             border-radius: 50%;
-            background: rgba(240, 179, 0, 0.06);
+            background: linear-gradient(145deg, rgba(240, 179, 0, 0.08), rgba(240, 179, 0, 0.02));
             border: 2px solid rgba(240, 179, 0, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2.6rem;
             flex-shrink: 0;
+            color: var(--gold-light);
+            box-shadow: 0 0 40px rgba(240, 179, 0, 0.04);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .id-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            inset: 0;
+        }
+
+        .id-avatar i {
+            z-index: 2;
         }
 
         .id-title h3 {
@@ -456,11 +635,6 @@
                 grid-template-columns: 1fr;
                 gap: 8px;
             }
-        }
-
-        .id-item {
-            display: flex;
-            flex-direction: column;
         }
 
         .id-item .label {
@@ -518,7 +692,6 @@
             }
         }
 
-        /* ---------- Back to Auth ---------- */
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -535,9 +708,15 @@
             color: #fff;
         }
 
-        /* ---------- Scrollbar ---------- */
         ::-webkit-scrollbar {
             width: 0;
+        }
+
+        /* hint text for upload */
+        .upload-hint-text {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            line-height: 1.3;
         }
     </style>
 </head>
@@ -557,21 +736,18 @@
     ============================================================ -->
     <div class="char-container">
 
-        <!-- Back Link -->
         <a href="#" class="back-link" id="backToAuth">
             <i class="fas fa-arrow-right"></i> عد إلى الحساب
         </a>
 
-        <!-- Card -->
         <div class="char-card">
 
-            <!-- Header -->
             <div class="char-header">
                 <a href="#" class="logo">
                     <i class="fas fa-crown"></i>
                     <span>Elysium</span>
                 </a>
-                <p>أنشِ هويتك الرقمية لبدء الحياة في العالم المستمر</p>
+                <p>أنشِ هويتك الرقمية واختر نقابتك لبدء الحياة</p>
                 <div class="step-indicator">
                     <span class="step-dot active"></span>
                     <span class="step-dot"></span>
@@ -585,20 +761,92 @@
             ============================================================ -->
             <form class="char-form" id="characterForm" novalidate>
 
-                <!-- Avatar Picker -->
+                <!-- ============================================================
+                PROFILE PICTURE UPLOAD
+                ============================================================ -->
                 <div class="form-group">
-                    <label>الصورة الرمزية</label>
-                    <div class="avatar-grid" id="avatarGrid">
-                        <button type="button" class="avatar-option" data-avatar="🧑‍💼">🧑‍💼</button>
-                        <button type="button" class="avatar-option" data-avatar="👨‍💼">👨‍💼</button>
-                        <button type="button" class="avatar-option" data-avatar="👩‍💼">👩‍💼</button>
-                        <button type="button" class="avatar-option" data-avatar="🧑‍🌾">🧑‍🌾</button>
-                        <button type="button" class="avatar-option" data-avatar="👨‍⚕️">👨‍⚕️</button>
-                        <button type="button" class="avatar-option" data-avatar="👩‍⚕️">👩‍⚕️</button>
-                        <button type="button" class="avatar-option" data-avatar="🧑‍🏫">🧑‍🏫</button>
-                        <button type="button" class="avatar-option" data-avatar="👨‍🔧">👨‍🔧</button>
+                    <label>الصورة الشخصية</label>
+                    <div class="profile-upload-wrapper">
+                        <div class="profile-upload-box" id="profileUploadBox">
+                            <input type="file" id="profileInput" accept="image/*" style="display:none;" />
+                            <div class="placeholder">
+                                <i class="fas fa-camera"></i>
+                                <span>أضف صورتك</span>
+                            </div>
+                            <button type="button" class="remove-img" id="removeProfileImg" aria-label="إزالة الصورة">
+                                <i class="fas fa-xmark"></i>
+                            </button>
+                        </div>
+                        <div class="upload-hint-text">
+                            <i class="fas fa-info-circle" style="color:var(--gold-light);"></i>
+                            يُفضل استخدام صورة مربعة (PNG, JPG)
+                        </div>
                     </div>
-                    <span style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">اختر رمزاً يعبر عن شخصيتك</span>
+                </div>
+
+                <!-- ============================================================
+                GUILDS (AVATAR ICONS) — جميع النقابات
+                ============================================================ -->
+                <div class="form-group">
+                    <label>النقابة / المسار المهني <span style="color:var(--text-muted);font-weight:400;text-transform:none;font-size:0.7rem;">(اختر رمزاً يعبر عنك)</span></label>
+                    <div class="avatar-grid" id="avatarGrid">
+                        <!-- الدولة / الحكم -->
+                        <button type="button" class="avatar-option selected" data-guild="state" data-icon="fa-crown" title="الدولة / الحكم (رئيس، حاكم)">
+                            <i class="fas fa-crown"></i>
+                        </button>
+                        <!-- السياسة والقانون -->
+                        <button type="button" class="avatar-option" data-guild="politics" data-icon="fa-landmark" title="السياسة والقانون (محامٍ، دبلوماسي)">
+                            <i class="fas fa-landmark"></i>
+                        </button>
+                        <!-- الأعمال والاقتصاد -->
+                        <button type="button" class="avatar-option" data-guild="business" data-icon="fa-user-tie" title="الأعمال والاقتصاد (رجل أعمال، مستثمر)">
+                            <i class="fas fa-user-tie"></i>
+                        </button>
+                        <!-- التعليم -->
+                        <button type="button" class="avatar-option" data-guild="education" data-icon="fa-graduation-cap" title="التعليم (أستاذ، معلم، باحث)">
+                            <i class="fas fa-graduation-cap"></i>
+                        </button>
+                        <!-- الصحة -->
+                        <button type="button" class="avatar-option" data-guild="health" data-icon="fa-user-doctor" title="الصحة (طبيب، ممرض، صيدلي)">
+                            <i class="fas fa-user-doctor"></i>
+                        </button>
+                        <!-- الهندسة والتقنية -->
+                        <button type="button" class="avatar-option" data-guild="engineering" data-icon="fa-user-gear" title="الهندسة والتقنية (مهندس، مبرمج)">
+                            <i class="fas fa-user-gear"></i>
+                        </button>
+                        <!-- الزراعة والبيئة -->
+                        <button type="button" class="avatar-option" data-guild="agriculture" data-icon="fa-seedling" title="الزراعة والبيئة (مزارع، عالم بيئة)">
+                            <i class="fas fa-seedling"></i>
+                        </button>
+                        <!-- الإعلام والاتصال -->
+                        <button type="button" class="avatar-option" data-guild="media" data-icon="fa-microphone" title="الإعلام والاتصال (صحفي، مذيع)">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <!-- الجيش والدفاع -->
+                        <button type="button" class="avatar-option" data-guild="military" data-icon="fa-shield-halved" title="الجيش والدفاع (ضابط، جندي)">
+                            <i class="fas fa-shield-halved"></i>
+                        </button>
+                        <!-- العدالة والقضاء -->
+                        <button type="button" class="avatar-option" data-guild="justice" data-icon="fa-scale-balanced" title="العدالة والقضاء (قاضٍ، محقق)">
+                            <i class="fas fa-scale-balanced"></i>
+                        </button>
+                        <!-- المالية والمصارف -->
+                        <button type="button" class="avatar-option" data-guild="finance" data-icon="fa-building-columns" title="المالية والمصارف (مصرفي، خبير مالي)">
+                            <i class="fas fa-building-columns"></i>
+                        </button>
+                        <!-- الأمن والشرطة -->
+                        <button type="button" class="avatar-option" data-guild="security" data-icon="fa-handcuffs" title="الأمن والشرطة (شرطي، أمني)">
+                            <i class="fas fa-handcuffs"></i>
+                        </button>
+                        <!-- النقل والطيران -->
+                        <button type="button" class="avatar-option" data-guild="transport" data-icon="fa-plane" title="النقل والطيران (طيار، قبطان)">
+                            <i class="fas fa-plane"></i>
+                        </button>
+                        <!-- الفن والثقافة -->
+                        <button type="button" class="avatar-option" data-guild="art" data-icon="fa-palette" title="الفن والثقافة (فنان، موسيقي)">
+                            <i class="fas fa-palette"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Name Row -->
@@ -684,7 +932,6 @@
                     </div>
                 </div>
 
-                <!-- Actions -->
                 <button type="submit" class="btn-char" id="createBtn">
                     <i class="fas fa-id-card"></i> إنشاء الشخصية
                 </button>
@@ -695,7 +942,9 @@
             ============================================================ -->
             <div class="id-card" id="idCard">
                 <div class="id-header">
-                    <div class="id-avatar" id="idAvatarDisplay">🧑‍💼</div>
+                    <div class="id-avatar" id="idAvatarDisplay">
+                        <i class="fas fa-crown"></i>
+                    </div>
                     <div class="id-title">
                         <h3 id="idFullName">أحمد الملك</h3>
                         <span class="id-number" id="idNumber">#ELY-2026-XXXX</span>
@@ -707,7 +956,8 @@
                     <div class="id-item"><span class="label">العمر</span><span class="value" id="idAge">٢٥ سنة</span></div>
                     <div class="id-item"><span class="label">الدولة</span><span class="value" id="idCountry">مصر</span></div>
                     <div class="id-item"><span class="label">المدينة</span><span class="value" id="idCity">القاهرة</span></div>
-                    <div class="id-item" style="grid-column: 1 / -1;"><span class="label">اللغة</span><span class="value" id="idLanguage">العربية</span></div>
+                    <div class="id-item"><span class="label">النقابة</span><span class="value" id="idGuild">الدولة / الحكم</span></div>
+                    <div class="id-item"><span class="label">اللغة</span><span class="value" id="idLanguage">العربية</span></div>
                 </div>
 
                 <div class="id-badge">
@@ -737,7 +987,11 @@
             const createBtn = document.getElementById('createBtn');
             const idCard = document.getElementById('idCard');
 
-            // Fields
+            // Profile Upload
+            const profileInput = document.getElementById('profileInput');
+            const profileBox = document.getElementById('profileUploadBox');
+            const removeProfileBtn = document.getElementById('removeProfileImg');
+
             const avatarOptions = document.querySelectorAll('.avatar-option');
             const firstName = document.getElementById('firstName');
             const lastName = document.getElementById('lastName');
@@ -747,7 +1001,7 @@
             const city = document.getElementById('city');
             const charLanguage = document.getElementById('charLanguage');
 
-            // ID Card fields
+            // ID Card
             const idAvatarDisplay = document.getElementById('idAvatarDisplay');
             const idFullName = document.getElementById('idFullName');
             const idNumber = document.getElementById('idNumber');
@@ -755,13 +1009,21 @@
             const idAge = document.getElementById('idAge');
             const idCountry = document.getElementById('idCountry');
             const idCity = document.getElementById('idCity');
+            const idGuild = document.getElementById('idGuild');
             const idLanguage = document.getElementById('idLanguage');
 
             const backLink = document.getElementById('backToAuth');
             const enterGameBtn = document.getElementById('enterGameBtn');
 
             // ============================================================
-            // City data (logical)
+            // State
+            // ============================================================
+            let selectedIcon = 'fa-crown';
+            let selectedGuildName = 'الدولة / الحكم';
+            let uploadedImageData = null; // base64 or null
+
+            // ============================================================
+            // City Data
             // ============================================================
             const citiesMap = {
                 'مصر': ['القاهرة', 'الإسكندرية', 'الجيزة', 'الأقصر'],
@@ -774,8 +1036,26 @@
                 'تونس': ['تونس', 'سوسة', 'صفاقس'],
             };
 
+            // Guild names map
+            const guildNames = {
+                'state': 'الدولة / الحكم',
+                'politics': 'السياسة والقانون',
+                'business': 'الأعمال والاقتصاد',
+                'education': 'التعليم',
+                'health': 'الصحة',
+                'engineering': 'الهندسة والتقنية',
+                'agriculture': 'الزراعة والبيئة',
+                'media': 'الإعلام والاتصال',
+                'military': 'الجيش والدفاع',
+                'justice': 'العدالة والقضاء',
+                'finance': 'المالية والمصارف',
+                'security': 'الأمن والشرطة',
+                'transport': 'النقل والطيران',
+                'art': 'الفن والثقافة',
+            };
+
             // ============================================================
-            // Update cities on country change
+            // Update Cities
             // ============================================================
             country.addEventListener('change', function() {
                 const selected = this.value;
@@ -791,26 +1071,61 @@
             });
 
             // ============================================================
-            // Avatar selection
+            // Avatar / Guild Selection
             // ============================================================
-            let selectedAvatar = '🧑‍💼';
-
             avatarOptions.forEach(btn => {
                 btn.addEventListener('click', function() {
                     avatarOptions.forEach(b => b.classList.remove('selected'));
                     this.classList.add('selected');
-                    selectedAvatar = this.dataset.avatar;
+                    selectedIcon = this.dataset.icon;
+                    const guildKey = this.dataset.guild;
+                    selectedGuildName = guildNames[guildKey] || guildKey;
                 });
             });
 
-            // Select first by default
-            if (avatarOptions.length > 0) {
-                avatarOptions[0].classList.add('selected');
-                selectedAvatar = avatarOptions[0].dataset.avatar;
-            }
+            // ============================================================
+            // Profile Image Upload
+            // ============================================================
+            profileBox.addEventListener('click', function(e) {
+                // Don't trigger if clicking remove button
+                if (e.target.closest('.remove-img')) return;
+                profileInput.click();
+            });
+
+            profileInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImageData = e.target.result;
+                    // Show image in box
+                    let img = profileBox.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        profileBox.appendChild(img);
+                    }
+                    img.src = uploadedImageData;
+                    profileBox.classList.add('has-image');
+                    // Update ID card preview if open? Will be done on submit.
+                };
+                reader.readAsDataURL(file);
+            });
+
+            removeProfileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                uploadedImageData = null;
+                const img = profileBox.querySelector('img');
+                if (img) img.remove();
+                profileBox.classList.remove('has-image');
+                profileInput.value = '';
+                // Update ID card if visible
+                if (idCard.classList.contains('visible')) {
+                    updateIdCardAvatar();
+                }
+            });
 
             // ============================================================
-            // Calculate age from DOB
+            // Helpers
             // ============================================================
             function calculateAge(birthDate) {
                 if (!birthDate) return null;
@@ -824,9 +1139,6 @@
                 return age;
             }
 
-            // ============================================================
-            // Generate ID number
-            // ============================================================
             function generateId() {
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                 let result = '#ELY-2026-';
@@ -836,13 +1148,27 @@
                 return result;
             }
 
+            function updateIdCardAvatar() {
+                // Clear previous content
+                idAvatarDisplay.innerHTML = '';
+                if (uploadedImageData) {
+                    const img = document.createElement('img');
+                    img.src = uploadedImageData;
+                    img.alt = 'صورة شخصية';
+                    idAvatarDisplay.appendChild(img);
+                } else {
+                    const icon = document.createElement('i');
+                    icon.className = `fas ${selectedIcon}`;
+                    idAvatarDisplay.appendChild(icon);
+                }
+            }
+
             // ============================================================
-            // Form submission
+            // Form Submit
             // ============================================================
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
-                // Validate
                 const fName = firstName.value.trim();
                 const lName = lastName.value.trim();
                 const gen = gender.value;
@@ -862,58 +1188,64 @@
                     return;
                 }
 
-                // Generate ID
                 const idNum = generateId();
                 const fullName = `${fName} ${lName}`;
 
-                // Populate ID Card
-                idAvatarDisplay.textContent = selectedAvatar;
+                // Update ID Card
+                updateIdCardAvatar();
+
                 idFullName.textContent = fullName;
                 idNumber.textContent = idNum;
                 idGender.textContent = gen;
                 idAge.textContent = `${age} سنة`;
                 idCountry.textContent = cnt;
                 idCity.textContent = cit;
+                idGuild.textContent = selectedGuildName;
                 idLanguage.textContent = lang === 'ar' ? 'العربية' : lang === 'en' ? 'English' : 'Français';
 
-                // Show card with animation
                 idCard.classList.add('visible');
                 idCard.style.display = 'block';
 
-                // Disable create button
                 createBtn.disabled = true;
                 createBtn.innerHTML = '<i class="fas fa-check-circle"></i> تم الإنشاء';
 
-                // Scroll to card
                 idCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                console.log('✅ Character created:', { fullName, gender: gen, age, country: cnt, city: cit, language: lang,
-                    avatar: selectedAvatar, id: idNum });
+                console.log('✅ Character created:', {
+                    fullName,
+                    gender: gen,
+                    age,
+                    country: cnt,
+                    city: cit,
+                    guild: selectedGuildName,
+                    language: lang,
+                    icon: selectedIcon,
+                    hasImage: !!uploadedImageData,
+                    id: idNum
+                });
             });
 
             // ============================================================
-            // Enter Game (simulate next phase)
+            // Enter Game
             // ============================================================
             enterGameBtn.addEventListener('click', function() {
                 alert('🎮 مرحباً بك في عالم Elysium!\n\n' +
                     'سيتم توجيهك إلى المرحلة الرابعة: اختيار سيناريو البداية.\n' +
                     '(فقير، متوسط الدخل، غني، طالب، موظف، طبيب، مهندس، صحفي، رجل أعمال، عسكري، سياسي، مجرم)');
-                // In production: redirect to scenario selection page
             });
 
             // ============================================================
-            // Back to auth
+            // Back
             // ============================================================
             backLink.addEventListener('click', function(e) {
                 e.preventDefault();
                 if (confirm('هل تريد العودة؟ لن تفقد بياناتك المدخلة.')) {
-                    window.location.href = 'auth.html'; // Simulated
                     alert('🔐 سيتم توجيهك إلى صفحة تسجيل الدخول.');
                 }
             });
 
             // ============================================================
-            // Particles (light)
+            // Particles
             // ============================================================
             const canvas = document.getElementById('char-particles');
             if (canvas) {
@@ -955,7 +1287,6 @@
                         ctx.fillStyle = `rgba(240,179,0,${p.a})`;
                         ctx.fill();
                     }
-                    // connections
                     for (let i = 0; i < particles.length; i++) {
                         for (let j = i + 1; j < particles.length; j++) {
                             const dx = particles[i].x - particles[j].x;
@@ -982,7 +1313,7 @@
                     init(); });
             }
 
-            console.log('🧑 Phase 3: Character Creation ready.');
+            console.log('🧑 Phase 3: Character Creation with Profile Upload & All Guilds ready.');
             console.log('📌 Next: Phase 4 — Starting Scenario Selection.');
         })();
     </script>
