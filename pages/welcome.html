@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elysium · مرحباً بك</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <style>
+        body { background: #06060b; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Cairo', sans-serif; padding: 20px; }
+        .welcome-card { background: rgba(18,18,42,0.75); backdrop-filter: blur(32px); border: 1px solid rgba(255,255,255,0.04); border-radius: 24px; padding: 40px 36px; max-width: 800px; width: 100%; }
+        .id-card-full { background: rgba(6,6,11,0.8); border: 1px solid rgba(240,179,0,0.06); border-radius: 20px; padding: 24px; }
+        .stat-item { background: rgba(255,255,255,0.02); border-radius: 14px; padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
+        .stat-item .num { font-size: 1.6rem; font-weight: 900; color: #ffd866; }
+        .btn-start { background: linear-gradient(135deg, #f0b300, #b8860b); color: #0a0a0f; font-weight: 800; padding: 16px 48px; border-radius: 60px; border: none; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
+        .btn-start:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(240,179,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="welcome-card">
+        <a href="../index.html" class="flex items-center justify-center gap-2 text-2xl font-black text-white no-underline mb-1">
+            <i class="fas fa-crown text-amber-400"></i><span class="bg-gradient-to-l from-amber-200 to-amber-600 bg-clip-text text-transparent">Elysium</span>
+        </a>
+        <p class="text-center text-gray-400 text-sm mb-6">مرحباً بك في عالمك الجديد</p>
+
+        <div class="id-card-full" id="welcomeIdCard">
+            <div class="flex items-center gap-4 border-b border-white/5 pb-4">
+                <div class="w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-4xl text-amber-400 overflow-hidden" id="welcomeAvatar"><i class="fas fa-crown"></i></div>
+                <div><h2 class="font-black text-2xl" id="welcomeName">أحمد الملك</h2><span class="text-gray-500 text-sm" id="welcomeId">#ELY-2026-XXXX</span><div class="bg-amber-500/10 text-amber-400 text-xs px-3 py-0.5 rounded-full inline-block mt-1" id="welcomeScenario">فقير</div></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mt-4 text-sm"><div><span class="text-gray-500 text-xs">الجنس</span><div id="wGender">ذكر</div></div><div><span class="text-gray-500 text-xs">العمر</span><div id="wAge">٢٥</div></div><div><span class="text-gray-500 text-xs">النقابة</span><div id="wGuild">الدولة</div></div></div>
+
+            <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mt-6">
+                <div class="stat-item"><div class="num" id="sMoney">١٠٠٠</div><div class="text-gray-500 text-xs">💰 أموال</div></div>
+                <div class="stat-item"><div class="num" id="sHealth">٨٠</div><div class="text-gray-500 text-xs">❤️ صحة</div></div>
+                <div class="stat-item"><div class="num" id="sEdu">٤٠</div><div class="text-gray-500 text-xs">📚 تعليم</div></div>
+                <div class="stat-item"><div class="num" id="sRep">٥٠</div><div class="text-gray-500 text-xs">⭐ سمعة</div></div>
+                <div class="stat-item"><div class="num" id="sPop">٣٠</div><div class="text-gray-500 text-xs">📢 شعبية</div></div>
+                <div class="stat-item"><div class="num" id="sProp">٠</div><div class="text-gray-500 text-xs">🏠 ممتلكات</div></div>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-4 justify-center mt-8">
+            <a href="game.html" class="btn-start text-center"><i class="fas fa-play ml-2"></i> ابدأ حياتك</a>
+            <a href="choose-scenario.html" class="text-gray-400 hover:text-white text-sm flex items-center justify-center"><i class="fas fa-arrow-right ml-1"></i> عد للسيناريو</a>
+        </div>
+    </div>
+
+    <script>
+        // Load data from session
+        const data = JSON.parse(sessionStorage.getItem('elysium_character') || '{}');
+        const p = data || { fullName: 'مواطن', icon: 'fa-crown', idNumber: '#ELY-2026-0000', gender: 'ذكر', age: 25,
+            scenario: 'متوسط' };
+        const stats = p.stats || { money: 1000, health: 80, education: 40, reputation: 50, popularity: 30, properties: 0 };
+
+        // Render
+        const avatar = document.getElementById('welcomeAvatar');
+        if (p.avatarImage) avatar.innerHTML = `<img src="${p.avatarImage}" class="w-full h-full object-cover" />`;
+        else avatar.innerHTML = `<i class="fas ${p.icon || 'fa-crown'}"></i>`;
+
+        document.getElementById('welcomeName').textContent = p.fullName || 'مواطن';
+        document.getElementById('welcomeId').textContent = p.idNumber || '#ELY-2026-0000';
+        document.getElementById('welcomeScenario').textContent = p.scenario || 'متوسط';
+        document.getElementById('wGender').textContent = p.gender || 'ذكر';
+        document.getElementById('wAge').textContent = p.age || '٢٥';
+        document.getElementById('wGuild').textContent = p.guild || 'عام';
+
+        document.getElementById('sMoney').textContent = stats.money?.toLocaleString() || '٠';
+        document.getElementById('sHealth').textContent = stats.health || '٠';
+        document.getElementById('sEdu').textContent = stats.education || '٠';
+        document.getElementById('sRep').textContent = stats.reputation || '٠';
+        document.getElementById('sPop').textContent = stats.popularity || '٠';
+        document.getElementById('sProp').textContent = stats.properties || '٠';
+    </script>
+</body>
+</html>
