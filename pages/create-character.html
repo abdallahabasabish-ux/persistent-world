@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elysium · إنشاء الشخصية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <style>
+        body { background: #06060b; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Cairo', sans-serif; padding: 20px; }
+        .char-card { background: rgba(18,18,42,0.75); backdrop-filter: blur(32px); border: 1px solid rgba(255,255,255,0.04); border-radius: 24px; padding: 40px 36px; max-width: 720px; width: 100%; }
+        .avatar-option { width: 56px; height: 56px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.02); color: #a8a8c8; }
+        .avatar-option:hover { transform: scale(1.08); border-color: rgba(240,179,0,0.2); }
+        .avatar-option.selected { border-color: #f0b300; background: rgba(240,179,0,0.08); box-shadow: 0 0 30px rgba(240,179,0,0.05); }
+        .avatar-option.selected i { color: #ffd866; }
+        .profile-upload-box { width: 80px; height: 80px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; overflow: hidden; background: rgba(255,255,255,0.02); }
+        .profile-upload-box:hover { border-color: rgba(240,179,0,0.2); }
+        .profile-upload-box img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-upload-box .placeholder { color: #6b6b8a; font-size: 0.6rem; text-align: center; }
+        .id-card { display: none; margin-top: 24px; background: rgba(6,6,11,0.9); border: 1px solid rgba(240,179,0,0.08); border-radius: 20px; padding: 24px; animation: fadeUp 0.5s ease; }
+        .id-card.visible { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-char { background: linear-gradient(135deg, #f0b300, #b8860b); color: #0a0a0f; font-weight: 800; padding: 16px; border-radius: 60px; border: none; width: 100%; cursor: pointer; transition: 0.3s; }
+        .btn-char:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(240,179,0,0.2); }
+        .btn-char:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .input-wrapper { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 0 14px; display: flex; align-items: center; transition: 0.3s; }
+        .input-wrapper:focus-within { border-color: rgba(240,179,0,0.3); }
+        .input-wrapper input, .input-wrapper select { background: transparent; border: none; outline: none; color: #fff; padding: 14px 0; width: 100%; font-family: 'Cairo', sans-serif; }
+        .input-wrapper select option { background: #1a1a3a; }
+    </style>
+</head>
+<body>
+    <div class="char-card">
+        <a href="../index.html" class="flex items-center justify-center gap-2 text-2xl font-black text-white no-underline mb-2">
+            <i class="fas fa-crown text-amber-400"></i><span class="bg-gradient-to-l from-amber-200 to-amber-600 bg-clip-text text-transparent">Elysium</span>
+        </a>
+        <p class="text-center text-gray-400 text-sm mb-6">أنشِ هويتك الرقمية</p>
+
+        <form id="charForm" class="flex flex-col gap-4">
+            <!-- Profile Upload -->
+            <div class="flex items-center gap-4">
+                <div class="profile-upload-box" id="profileBox">
+                    <input type="file" id="profileInput" accept="image/*" style="display:none;" />
+                    <div class="placeholder"><i class="fas fa-camera text-xl"></i><span>أضف صورتك</span></div>
+                    <img id="profilePreview" style="display:none; width:100%; height:100%; object-fit:cover;" />
+                </div>
+                <span class="text-gray-500 text-xs">PNG, JPG</span>
+            </div>
+
+            <!-- Avatars (Guilds) -->
+            <div>
+                <label class="text-gray-400 text-xs font-bold uppercase">النقابة</label>
+                <div class="flex flex-wrap gap-2 mt-1" id="avatarGrid">
+                    <button type="button" class="avatar-option selected" data-icon="fa-crown"><i class="fas fa-crown"></i></button>
+                    <button type="button" class="avatar-option" data-icon="fa-user-tie"><i class="fas fa-user-tie"></i></button>
+                    <button type="button" class="avatar-option" data-icon="fa-user-doctor"><i class="fas fa-user-doctor"></i></button>
+                    <button type="button" class="avatar-option" data-icon="fa-graduation-cap"><i class="fas fa-graduation-cap"></i></button>
+                    <button type="button" class="avatar-option" data-icon="fa-shield-halved"><i class="fas fa-shield-halved"></i></button>
+                    <button type="button" class="avatar-option" data-icon="fa-scale-balanced"><i class="fas fa-scale-balanced"></i></button>
+                    <button type="button" class="avatar-option" data-icon="fa-seedling"><i class="fas fa-seedling"></i></button>
+                    <button type="button" class="avatar-option" data-icon="fa-microphone"><i class="fas fa-microphone"></i></button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="input-wrapper"><i class="fas fa-user text-gray-500 ml-3"></i><input type="text" placeholder="الاسم الأول" id="firstName" required /></div>
+                <div class="input-wrapper"><i class="fas fa-user-tag text-gray-500 ml-3"></i><input type="text" placeholder="اسم العائلة" id="lastName" required /></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="input-wrapper"><i class="fas fa-venus-mars text-gray-500 ml-3"></i><select id="gender" required><option value="">الجنس</option><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select></div>
+                <div class="input-wrapper"><i class="fas fa-calendar-day text-gray-500 ml-3"></i><input type="date" id="dob" required /></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="input-wrapper"><i class="fas fa-flag text-gray-500 ml-3"></i><select id="country" required><option value="">الدولة</option><option value="مصر">مصر</option><option value="السعودية">السعودية</option></select></div>
+                <div class="input-wrapper"><i class="fas fa-city text-gray-500 ml-3"></i><select id="city" required><option value="">المدينة</option></select></div>
+            </div>
+
+            <button type="submit" class="btn-char" id="createBtn"><i class="fas fa-id-card ml-2"></i> إنشاء الشخصية</button>
+        </form>
+
+        <!-- ID Card -->
+        <div class="id-card" id="idCard">
+            <div class="flex items-center gap-4 border-b border-white/5 pb-4">
+                <div class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-3xl text-amber-400" id="idAvatar"><i class="fas fa-crown"></i></div>
+                <div><h3 class="font-bold text-lg" id="idName">أحمد الملك</h3><span class="text-gray-500 text-xs" id="idNumber">#ELY-2026-XXXX</span></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 mt-4 text-sm"><div><span class="text-gray-500 text-xs">الجنس</span><div id="idGender">ذكر</div></div><div><span class="text-gray-500 text-xs">العمر</span><div id="idAge">٢٥</div></div></div>
+            <div class="mt-4 flex justify-between items-center"><span class="text-green-400 text-sm"><span class="w-2 h-2 bg-green-400 rounded-full inline-block animate-pulse"></span> بطاقة نشطة</span>
+                <a href="choose-scenario.html" class="btn-char px-6 py-2 text-sm inline-block w-auto" id="enterGameBtn"><i class="fas fa-play ml-1"></i> بدء الحياة</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // City mapping
+        const cities = { 'مصر': ['القاهرة', 'الإسكندرية'], 'السعودية': ['الرياض', 'جدة'] };
+        document.getElementById('country').addEventListener('change', function() {
+            const el = document.getElementById('city');
+            el.innerHTML = '<option value="">المدينة</option>';
+            (cities[this.value] || []).forEach(c => { const o = document.createElement('option');
+                o.value = c;
+                o.textContent = c;
+                el.appendChild(o); });
+        });
+
+        // Avatar selection
+        let selectedIcon = 'fa-crown';
+        document.querySelectorAll('.avatar-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedIcon = this.dataset.icon;
+            });
+        });
+
+        // Profile image upload
+        const profileBox = document.getElementById('profileBox');
+        const profileInput = document.getElementById('profileInput');
+        const profilePreview = document.getElementById('profilePreview');
+        let avatarImage = null;
+
+        profileBox.addEventListener('click', () => profileInput.click());
+        profileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                avatarImage = e.target.result;
+                profilePreview.src = avatarImage;
+                profilePreview.style.display = 'block';
+                profileBox.querySelector('.placeholder').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Form submit
+        document.getElementById('charForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fName = document.getElementById('firstName').value.trim();
+            const lName = document.getElementById('lastName').value.trim();
+            const gender = document.getElementById('gender').value;
+            const dob = document.getElementById('dob').value;
+            const country = document.getElementById('country').value;
+            const city = document.getElementById('city').value;
+
+            if (!fName || !lName || !gender || !dob || !country || !city) { alert('يرجى ملء جميع الحقول.'); return; }
+
+            // Save to sessionStorage
+            const charData = {
+                fullName: `${fName} ${lName}`,
+                gender,
+                age: new Date().getFullYear() - new Date(dob).getFullYear(),
+                country,
+                city,
+                icon: selectedIcon,
+                avatarImage,
+                idNumber: '#ELY-2026-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+                stats: { money: 1000, health: 80, education: 40, reputation: 50, popularity: 30, properties: 0 }
+            };
+            sessionStorage.setItem('elysium_character', JSON.stringify(charData));
+
+            // Show ID Card
+            document.getElementById('idAvatar').innerHTML = `<i class="fas ${selectedIcon}"></i>`;
+            if (avatarImage) document.getElementById('idAvatar').innerHTML = `<img src="${avatarImage}" class="w-full h-full object-cover rounded-full" />`;
+            document.getElementById('idName').textContent = charData.fullName;
+            document.getElementById('idNumber').textContent = charData.idNumber;
+            document.getElementById('idGender').textContent = charData.gender;
+            document.getElementById('idAge').textContent = charData.age;
+            document.getElementById('idCard').classList.add('visible');
+            document.getElementById('createBtn').disabled = true;
+            document.getElementById('createBtn').innerHTML = '<i class="fas fa-check ml-2"></i> تم الإنشاء';
+        });
+    </script>
+</body>
+</html>
