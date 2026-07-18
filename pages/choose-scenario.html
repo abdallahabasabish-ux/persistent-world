@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elysium · اختر سيناريو</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <style>
+        body { background: #06060b; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Cairo', sans-serif; padding: 20px; }
+        .scenario-card { background: rgba(18,18,42,0.75); backdrop-filter: blur(32px); border: 1px solid rgba(255,255,255,0.04); border-radius: 24px; padding: 40px 36px; max-width: 900px; width: 100%; }
+        .scenario-item { background: rgba(255,255,255,0.02); border: 2px solid rgba(255,255,255,0.04); border-radius: 18px; padding: 20px 16px; text-align: center; cursor: pointer; transition: 0.3s; min-height: 200px; display: flex; flex-direction: column; align-items: center; }
+        .scenario-item:hover { border-color: rgba(240,179,0,0.2); transform: translateY(-4px); background: rgba(255,255,255,0.04); }
+        .scenario-item.selected { border-color: #f0b300; background: rgba(240,179,0,0.04); box-shadow: 0 0 40px rgba(240,179,0,0.04); }
+        .scenario-item .icon { width: 56px; height: 56px; border-radius: 50%; background: rgba(240,179,0,0.06); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #ffd866; margin-bottom: 10px; }
+        .btn-confirm { padding: 14px 48px; background: linear-gradient(135deg, #f0b300, #b8860b); color: #0a0a0f; font-weight: 800; border-radius: 60px; border: none; cursor: pointer; transition: 0.3s; opacity: 0.4; pointer-events: none; transform: scale(0.95); }
+        .btn-confirm.active { opacity: 1; pointer-events: all; transform: scale(1); }
+        .btn-confirm.active:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(240,179,0,0.2); }
+        .tag-pro { background: rgba(34,197,94,0.08); color: #4ade80; border: 1px solid rgba(34,197,94,0.05); padding: 2px 10px; border-radius: 100px; font-size: 0.6rem; font-weight: 700; }
+        .tag-con { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.05); padding: 2px 10px; border-radius: 100px; font-size: 0.6rem; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="scenario-card">
+        <a href="../index.html" class="flex items-center justify-center gap-2 text-2xl font-black text-white no-underline mb-1">
+            <i class="fas fa-crown text-amber-400"></i><span class="bg-gradient-to-l from-amber-200 to-amber-600 bg-clip-text text-transparent">Elysium</span>
+        </a>
+        <p class="text-center text-gray-400 text-sm mb-6">اختر كيف تبدأ حياتك</p>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="scenarioGrid">
+            <div class="scenario-item" data-scenario="فقير"><div class="icon"><i class="fas fa-hand-holding-dollar"></i></div><h3 class="font-bold">فقير</h3><div class="flex flex-col gap-1 mt-2 w-full"><span class="tag-pro">+ قدرة على التكيف</span><span class="tag-con">- موارد محدودة</span></div></div>
+            <div class="scenario-item" data-scenario="غني"><div class="icon"><i class="fas fa-sack-dollar"></i></div><h3 class="font-bold">غني</h3><div class="flex flex-col gap-1 mt-2 w-full"><span class="tag-pro">+ ثروة ضخمة</span><span class="tag-con">- ضرائب مرتفعة</span></div></div>
+            <div class="scenario-item" data-scenario="طالب"><div class="icon"><i class="fas fa-graduation-cap"></i></div><h3 class="font-bold">طالب</h3><div class="flex flex-col gap-1 mt-2 w-full"><span class="tag-pro">+ تعليم متقدم</span><span class="tag-con">- دخل صفر</span></div></div>
+            <div class="scenario-item" data-scenario="طبيب"><div class="icon"><i class="fas fa-user-doctor"></i></div><h3 class="font-bold">طبيب</h3><div class="flex flex-col gap-1 mt-2 w-full"><span class="tag-pro">+ احترام كبير</span><span class="tag-con">- ضغط عمل شديد</span></div></div>
+            <div class="scenario-item" data-scenario="مهندس"><div class="icon"><i class="fas fa-user-gear"></i></div><h3 class="font-bold">مهندس</h3><div class="flex flex-col gap-1 mt-2 w-full"><span class="tag-pro">+ دخل جيد</span><span class="tag-con">- بيئة تنافسية</span></div></div>
+            <div class="scenario-item" data-scenario="صحفي"><div class="icon"><i class="fas fa-microphone"></i></div><h3 class="font-bold">صحفي</h3><div class="flex flex-col gap-1 mt-2 w-full"><span class="tag-pro">+ تأثير على الرأي</span><span class="tag-con">- مهنة خطيرة</span></div></div>
+            <div class="scenario-item" data-scenario="سياسي"><div class="icon"><i class="fas fa-landmark"></i></div><h3 class="font-bold">سياسي</h3><div class="flex flex-col gap-1 mt-2 w-full"><span class="tag-pro">+ نفوذ سياسي</span><span class="tag-con">- رقابة شعبية</span></div></div>
+            <div class="scenario-item" data-scenario="مجرم"><div class="icon"><i class="fas fa-skull"></i></div><h3 class="font-bold">مجرم</h3><div class="flex flex-col gap-1 mt-2 w-full"><span class="tag-pro">+ أموال سريعة</span><span class="tag-con">- خطر السجن</span></div></div>
+        </div>
+
+        <div class="text-center mt-8">
+            <button class="btn-confirm" id="confirmBtn"><i class="fas fa-check ml-2"></i> تأكيد المسار</button>
+        </div>
+        <div class="text-center mt-4"><a href="create-character.html" class="text-gray-500 text-sm hover:text-white"><i class="fas fa-arrow-right ml-1"></i> عد إلى إنشاء الشخصية</a></div>
+    </div>
+
+    <script>
+        let selected = null;
+        document.querySelectorAll('.scenario-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.scenario-item').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                selected = this.dataset.scenario;
+                document.getElementById('confirmBtn').classList.add('active');
+            });
+        });
+
+        document.getElementById('confirmBtn').addEventListener('click', function() {
+            if (!selected) return;
+            // Save scenario to session
+            const data = JSON.parse(sessionStorage.getItem('elysium_character') || '{}');
+            data.scenario = selected;
+            // Update stats based on scenario
+            const stats = { money: 1000, health: 80, education: 40, reputation: 50, popularity: 30, properties: 0 };
+            if (selected === 'غني') { stats.money = 50000;
+                stats.reputation = 70; }
+            if (selected === 'فقير') { stats.money = 200;
+                stats.health = 60; }
+            if (selected === 'طالب') { stats.education = 80;
+                stats.money = 100; }
+            if (selected === 'طبيب') { stats.money = 8000;
+                stats.reputation = 85; }
+            if (selected === 'سياسي') { stats.popularity = 60;
+                stats.reputation = 60; }
+            if (selected === 'مجرم') { stats.money = 5000;
+                stats.reputation = 10; }
+            data.stats = stats;
+            sessionStorage.setItem('elysium_character', JSON.stringify(data));
+            window.location.href = 'welcome.html';
+        });
+    </script>
+</body>
+</html>
