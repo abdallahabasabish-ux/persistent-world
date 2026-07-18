@@ -1,0 +1,39 @@
+<!-- شريط التنقل العلوي -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="القائمة الرئيسية">
+    <div class="container-custom flex items-center justify-between">
+        <a href="index.html" class="logo" aria-label="Elysium الرئيسية">
+            <i class="fas fa-crown text-gold-gradient" style="font-size:1.4rem;"></i>
+            <span>Elysium</span>
+        </a>
+
+        <div class="nav-links flex items-center gap-8">
+            <a href="#concept" class="nav-link">الفكرة</a>
+            <a href="#features" class="nav-link">المميزات</a>
+            <a href="#trailer" class="nav-link">العرض</a>
+            <a href="#timeline" class="nav-link">التطوير</a>
+            <a href="#stats" class="nav-link">إحصائيات</a>
+            <a href="#faq" class="nav-link">الأسئلة</a>
+            <a href="pages/login.html" class="btn-primary" style="padding:10px 28px;font-size:0.85rem;">
+                <i class="fas fa-rocket"></i> ابدأ الآن
+            </a>
+        </div>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="فتح القائمة" style="background:none;border:none;color:#fff;font-size:1.6rem;cursor:pointer;">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</nav>
+
+<!-- القائمة الجوالة -->
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="القائمة الجوالة">
+    <button class="close-btn" id="mobileClose" aria-label="إغلاق القائمة">
+        <i class="fas fa-xmark"></i>
+    </button>
+    <a href="#concept">الفكرة</a>
+    <a href="#features">المميزات</a>
+    <a href="#trailer">العرض</a>
+    <a href="#timeline">التطوير</a>
+    <a href="#stats">إحصائيات</a>
+    <a href="#faq">الأسئلة</a>
+    <a href="pages/login.html" class="btn-primary" style="padding:14px 40px;">ابدأ الآن</a>
+</div>
